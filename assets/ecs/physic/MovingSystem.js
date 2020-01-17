@@ -28,20 +28,21 @@ let MovingSystem = [
     },
 ];
 
-let MovingModule = {
-    name: 'MovingModule',
-    onLoad: function (ecs) {
-        // Module 注册component
-        ecs.registerComponent('CmpPosition', CmpPosition, 300, 10);
-        ecs.registerComponent('CmpVelocity', CmpVelocity, 300, 10);
-        ecs.registerComponent('CmpAccelation', CmpAccelation, 300, 10);
-        ecs.registerComponent('CmpPolygon', CmpPolygon, 200, 10);
-        ecs.registerComponent('CmpCircle', CmpCircle, 200, 10);
-        ecs.registerSystem(MovingSystem);
-    }
-};
+// let MovingModule = {
+//     name: 'MovingModule',
+//     onLoad: function (ecs) {
+//         // Module 注册component
+//         ecs.registerComponent('CmpPosition', CmpPosition, 300, 10);
+//         ecs.registerComponent('CmpVelocity', CmpVelocity, 300, 10);
+//         ecs.registerComponent('CmpAccelation', CmpAccelation, 300, 10);
+//         ecs.registerComponent('CmpPolygon', CmpPolygon, 200, 10);
+//         ecs.registerComponent('CmpCircle', CmpCircle, 200, 10);
+//         ecs.registerSystem(MovingSystem);
+//     }
+// };
 
 module.exports = {
-    MovingSystem: MovingSystem,
-    MovingModule: MovingModule
+    MovingSystem: MovingSystem
+    // ,
+    // MovingModule: MovingModule
 };

@@ -99,6 +99,90 @@ class Canvas extends Component {
     }
 }
 
+let updateSystem = {
+    name: 'updating',
+    components: [CmpCollider, [CmpCircle, CmpPolygon]],
+    update: function (ent, dt, now, ecs) {
+        let cCollider = ent.get('CmpCollider');
+        cCollider.updateBorder();
+        let world = ecs.getSingleton(CmpPhysicWorld);
+        world.remove(cCollider, true);
+        world.insert(cCollider, true);
+    }
+};
+
+let collisionSystem = {
+    name: 'collision',
+    enable: false,
+    components: [CmpCollider, [CmpCircle, CmpPolygon], CmpVelocity],
+    update: function (ent, dt, now, ecs) {
+        let world = ecs.getSingleton(CmpPhysicWorld);
+        let colliderA = ent.get('CmpCollider');
+        let posA = ent.get('CmpPolygon') || ent.get('CmpCircle');
+        let velA = ent.get('CmpVelocity') || ent.get('CmpVelocity');
+        let result = new CmpContact();
+        let potentials = world.potentials(ent);
+        for (const colliderB of potentials) {
+            if (colliderA.collide(colliderB, result)) {
+
+                let posB = colliderB.getSibling('CmpPolygon') || colliderB.getSibling('CmpCircle');
+                let velB = colliderB.getSibling('CmpVelocity') || colliderB.getSibling('CmpVelocity');
+                posA.x -= result.overlap * result.overlap_x;
+                posA.y -= result.overlap * result.overlap_y;
+
+                let velAN = velA.normalize();
+                let speed = velA.speed;
+
+                let dot = velAN.x * result.overlap_y + velAN.y * -result.overlap_x;
+
+                velAN.x = 2 * dot * result.overlap_y - velAN.x;
+                velAN.y = 2 * dot * -result.overlap_x - velAN.y;
+                velAN.normalize(true);
+                velA.x = velAN.x * speed;
+                velA.y = velAN.y * speed;
+
+                if (velB) {
+                    let velBN = velB.normalize();
+                    speed = velB.speed;
+                    dot = velBN.x * result.overlap_y + velBN.y * -result.overlap_x;
+                    velBN.x = 2 * dot * result.overlap_y - velBN.x;
+                    velBN.x = 2 * dot * -result.overlap_x - velBN.y;
+                    velBN.normalize(true);
+                    velB.x = velBN.x * speed;
+                    velB.y = velBN.y * speed;
+                }
+            }
+        }
+    }
+};
+
+let shapeRendererSystem = {
+    name: 'shapeRenderer',
+    components: [[CmpCircle, CmpPolygon]],
+    beforeUpdate: function (dt, now, ecs) {
+        if (this.getSize() < 1200) {
+            ecs.spawnEntity('CmpCircle', Dice.rng(-300, 300), Dice.rng(-300, 300), Dice.rng(3, 8), 1);
+            ecs.spawnEntity('CmpPolygon', Dice.rng(-300, 300), Dice.rng(-300, 300), [[-4, -4], [4, -4], [4, 4], [-4, 4]], Dice.rng(0, 3), 1);
+        }
+        let cCanvas = ecs.getSingleton('Canvas');
+        cCanvas.clear();
+    },
+    update: (ent, dt, now, ecs) => {
+        let cPolygon = ent.get('CmpPolygon');
+        let cCircle = ent.get('CmpCircle');
+        let cCanvas = ecs.getSingleton('Canvas');
+        let context = cCanvas.getContext(Dice.rngInt(0, 6));
+        cPolygon && cPolygon.draw(context);
+        cCircle && cCircle.draw(context);
+    },
+    afterUpdate: function (dt, now, ecs) {
+        let cCanvas = ecs.getSingleton('Canvas');
+        for (let i = 0; i < 7; i++) {
+            cCanvas.getContext(i).strokeColor = cc.Color.BLUE;
+            cCanvas.getContext(i).stroke();
+        }
+    }
+};
 
 module.exports = {
     name: 'PhysicTest',
@@ -112,90 +196,9 @@ module.exports = {
         ecs.registerComponent(CmpVelocity);
         ecs.registerComponent(CmpAccelation);
         ecs.registerSystem(MovingSystem);
-        ecs.registerSystem({
-            name: 'updating',
-            components: [CmpCollider, [CmpCircle, CmpPolygon]],
-            update: function (ent, dt, now, ecs) {
-                let cCollider = ent.get('CmpCollider');
-                cCollider.updateBorder();
-                let world = ecs.getSingleton(CmpPhysicWorld);
-                world.remove(cCollider, true);
-                world.insert(cCollider, true);
-            }
-        });
-
-        ecs.registerSystem({
-            name: 'collision',
-            enable: false,
-            components: [CmpCollider, [CmpCircle, CmpPolygon], CmpVelocity],
-            update: function (ent, dt, now, ecs) {
-                let world = ecs.getSingleton(CmpPhysicWorld);
-                let colliderA = ent.get('CmpCollider');
-                let posA = ent.get('CmpPolygon') || ent.get('CmpCircle');
-                let velA = ent.get('CmpVelocity') || ent.get('CmpVelocity');
-                let result = new CmpContact();
-                let potentials = world.potentials(ent);
-                for (const colliderB of potentials) {
-                    if (colliderA.collide(colliderB, result)) {
-
-                        let posB = colliderB.getSibling('CmpPolygon') || colliderB.getSibling('CmpCircle');
-                        let velB = colliderB.getSibling('CmpVelocity') || colliderB.getSibling('CmpVelocity');
-                        posA.x -= result.overlap * result.overlap_x;
-                        posA.y -= result.overlap * result.overlap_y;
-
-                        let velAN = velA.normalize();
-                        let speed = velA.speed;
-
-                        let dot = velAN.x * result.overlap_y + velAN.y * -result.overlap_x;
-
-                        velAN.x = 2 * dot * result.overlap_y - velAN.x;
-                        velAN.y = 2 * dot * -result.overlap_x - velAN.y;
-                        velAN.normalize(true);
-                        velA.x = velAN.x * speed;
-                        velA.y = velAN.y * speed;
-
-                        if (velB) {
-                            let velBN = velB.normalize();
-                            speed = velB.speed;
-                            dot = velBN.x * result.overlap_y + velBN.y * -result.overlap_x;
-                            velBN.x = 2 * dot * result.overlap_y - velBN.x;
-                            velBN.x = 2 * dot * -result.overlap_x - velBN.y;
-                            velBN.normalize(true);
-                            velB.x = velBN.x * speed;
-                            velB.y = velBN.y * speed;
-                        }
-                    }
-                }
-            }
-        });
-
-        ecs.registerSystem({
-            name: 'shapeRenderer',
-            components: [[CmpCircle, CmpPolygon]],
-            beforeUpdate: function (dt, now, ecs) {
-                if (this.getSize() < 1200) {
-                    ecs.spawnEntity('CmpCircle', Dice.rng(-300, 300), Dice.rng(-300, 300), Dice.rng(3, 8), 1);
-                    ecs.spawnEntity('CmpPolygon', Dice.rng(-300, 300), Dice.rng(-300, 300), [[-4, -4], [4, -4], [4, 4], [-4, 4]], Dice.rng(0, 3), 1);
-                }
-                let cCanvas = ecs.getSingleton('Canvas');
-                cCanvas.clear();
-            },
-            update: (ent, dt, now, ecs) => {
-                let cPolygon = ent.get('CmpPolygon');
-                let cCircle = ent.get('CmpCircle');
-                let cCanvas = ecs.getSingleton('Canvas');
-                let context = cCanvas.getContext(Dice.rngInt(0, 6));
-                cPolygon && cPolygon.draw(context);
-                cCircle && cCircle.draw(context);
-            },
-            afterUpdate: function (dt, now, ecs) {
-                let cCanvas = ecs.getSingleton('Canvas');
-                for (let i = 0; i < 7; i++) {
-                    cCanvas.getContext(i).strokeColor = cc.Color.BLUE;
-                    cCanvas.getContext(i).stroke();
-                }
-            }
-        });
+        ecs.registerSystem(updateSystem);
+        ecs.registerSystem(collisionSystem);
+        ecs.registerSystem(shapeRendererSystem);
 
         ecs.setSpawner('CmpPolygon', function (ecs, x, y, points, rotation, scaleX, scaleY) {
             let ent = ecs.createEntity();
@@ -226,6 +229,6 @@ module.exports = {
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[width, 0], [width, height]]);
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[width, height], [0, height]]);
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[0, height], [0, 0]]);
-        console.log(cc.macro.BATCH_VERTEX_COUNT);
+        console.log('wcx BATCH_VERTEX_COUNT = ' + cc.macro.BATCH_VERTEX_COUNT);
     }
 };
