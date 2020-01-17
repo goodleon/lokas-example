@@ -1,4 +1,4 @@
-const Rect = require('./Rect');
+const CmpRect = require('./CmpRect');
 const CmpCollider = require('./CmpCollider');
 const Entity = require('../Entity');
 const Component = require('../Component');
@@ -6,7 +6,7 @@ const Collision = require('Collision');
 
 const branch_pool = [];
 
-class CmpBVBranch extends Rect {
+class CmpBVBranch extends CmpRect {
     constructor(minX = 0, maxX = 0, minY = 0, maxY = 0, world = null) {
         super(minX, maxX, minY, maxY);
         this.parent = null;

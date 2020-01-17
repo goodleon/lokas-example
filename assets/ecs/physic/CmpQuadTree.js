@@ -1,8 +1,8 @@
-const Rect = require('./Rect');
+const CmpRect = require('./CmpRect');
 const Entity = require('../Entity');
 const Component = require('../Component');
 
-class CmpQuadTree extends Rect {
+class CmpQuadTree extends CmpRect {
     static defineName() {
         return 'CmpQuadTree';
     }
@@ -97,7 +97,7 @@ class CmpQuadTree extends Rect {
     }
 }
 
-class QuadBranch extends Rect {
+class QuadBranch extends CmpRect {
     static defineName() {
         return 'CmpQuadTree';
     }

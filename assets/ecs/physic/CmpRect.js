@@ -1,8 +1,8 @@
 const Component = require('../Component');
 
-class Rect extends Component {
+class CmpRect extends Component {
     static defineName() {
-        return 'Rect';
+        return 'CmpRect';
     }
 
     constructor(minX = 0, minY = 0, maxX = 0, maxY = 0) {
@@ -61,4 +61,4 @@ class Rect extends Component {
 
 }
 
-module.exports = Rect;
+module.exports = CmpRect;

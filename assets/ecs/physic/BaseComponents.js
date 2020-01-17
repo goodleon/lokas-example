@@ -2,6 +2,9 @@ const ECSUtil = require('../ECSUtil');
 const nbt = require('../binary/nbt');
 const Component = require('../Component');
 
+/**
+ * 矢量 xyz,angle
+ */
 class CmpVector extends Component {
     static defineName() {
         return 'CmpVector';
@@ -27,13 +30,13 @@ class CmpVector extends Component {
         return new this.__proto__.constructor(this.x, this.y, this.z);
     }
 
-    assgin(v) {
+    assgin(v) { // 分配
         this.x = v.x || this.x;
         this.y = v.y || this.y;
         this.z = v.z || this.z;
     }
 
-    reverse(self) {
+    reverse(self) { // 反转 | 交换
         let ret = self ? this : this.clone();
         ret.x = -ret.x;
         ret.y = -ret.y;
@@ -41,11 +44,11 @@ class CmpVector extends Component {
         return ret;
     }
 
-    equal(v) {
+    equal(v) { // 相等?
         return this.x === v.x && this.y === v.y && this.z === v.z;
     }
 
-    add(pos, self) {
+    add(pos, self) { // 向量相加
         let ret = self ? this : this.clone();
         ret.x += pos.x;
         ret.y += pos.y;
@@ -53,14 +56,14 @@ class CmpVector extends Component {
         return ret;
     }
 
-    normalize(self) {
+    normalize(self) { // 向量 规格化
         let ret = self ? this : this.clone();
         let length = ret.length;
         ret = ret.divide(length, self);
         return ret;
     }
 
-    minus(pos, self) {
+    minus(pos, self) { // 相减
         let ret = self ? this : this.clone();
         ret.x -= pos.x;
         ret.y -= pos.y;
@@ -68,7 +71,7 @@ class CmpVector extends Component {
         return ret;
     }
 
-    divide(v, self) {
+    divide(v, self) { // 相除
         let ret = self ? this : this.clone();
         ret.x /= v;
         ret.y /= v;
@@ -76,7 +79,7 @@ class CmpVector extends Component {
         return ret;
     }
 
-    multiply(v, self) {
+    multiply(v, self) { // 相乘
         let ret = self ? this : this.clone();
         ret.x *= v;
         ret.y *= v;
@@ -84,7 +87,7 @@ class CmpVector extends Component {
         return ret;
     }
 
-    floor(v, self) {
+    floor(v, self) { // 基
         let ret = self ? this : this.clone();
         ret.x = Math.floor(ret.x);
         ret.y = Math.floor(ret.y);
@@ -164,7 +167,7 @@ class CmpPosition extends CmpVector {
 }
 
 /**
- * 运动 向量
+ * 速率 向量
  */
 class CmpVelocity extends CmpVector {
     static defineName() {
@@ -184,6 +187,7 @@ class CmpVelocity extends CmpVector {
     }
 }
 
+// 加速度
 class CmpAccelation extends CmpVector {
     static defineName() {
         return 'CmpAccelation';
@@ -207,6 +211,7 @@ let RotationAccelation = function () {
 
 };
 
+// size Cmp
 class CmpSize extends Component {
     static defineName() {
         return 'CmpSize';
@@ -226,7 +231,7 @@ class CmpSize extends Component {
     }
 }
 
-
+// time 标志
 class CmpTimeStamp extends Component {
     static defineName() {
         return 'CmpTimeStamp';

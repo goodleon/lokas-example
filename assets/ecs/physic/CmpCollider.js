@@ -1,12 +1,12 @@
 /**
  * 碰撞机
- * @type {Rect}
+ * @type {CmpRect}
  */
-const Rect = require('./Rect');
+const CmpRect = require('./CmpRect');
 const CmpContact = require('./CmpContact');
 const Collision = require('./Collision');
 
-class CmpCollider extends Rect {
+class CmpCollider extends CmpRect {
     static defineName() {
         return 'CmpCollider';
     }
