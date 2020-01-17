@@ -6,12 +6,13 @@ const Rect = require('./Rect');
 const Contact = require('./Contact');
 const Collision = require('./Collision');
 
-class Collider extends Rect{
-    static defineName(){
+class Collider extends Rect {
+    static defineName() {
         return 'Collider';
     }
-    constructor(minX=0,minY=0,maxX=0,maxY=0,padding=0){
-        super(minX,minY,maxX,maxY);
+
+    constructor(minX = 0, minY = 0, maxX = 0, maxY = 0, padding = 0) {
+        super(minX, minY, maxX, maxY);
         this.padding = padding;
         this.minX = 0;
         this.maxX = 0;
@@ -25,7 +26,8 @@ class Collider extends Rect{
         this.contacts = [];
         this.collideCount = 0;
     }
-    addContact(entity,contact){
+
+    addContact(entity, contact) {
         if (this.contacts[entity.id]) {
             return;
         }
@@ -35,22 +37,25 @@ class Collider extends Rect{
         cod.collideCount++;
         this.collideCount++;
     }
+
     removeAllContacts() {
         for (let i in this.contacts) {
             this.removeContact(i);
         }
     }
-    checkIsCollidable(a,b,world) {
-        if (!a||!b) {
+
+    checkIsCollidable(a, b, world) {
+        if (!a || !b) {
             return false;
         }
-        if (!a.tag&&!b.tag) {
+        if (!a.tag && !b.tag) {
             return true;
         }
-        return world.config[a.tag]?world.config[a.tag][b.tag]:false;
+        return world.config[a.tag] ? world.config[a.tag][b.tag] : false;
     }
-    createContact(ecs,A,B) {
-        let contact = this.isContact(A,B);
+
+    createContact(ecs, A, B) {
+        let contact = this.isContact(A, B);
         if (contact) {
             contact.get(Contact).dispatchStayEvent();
             return;
@@ -59,15 +64,17 @@ class Collider extends Rect{
 
 
         let cent = ecs.createEntity();
-        contact = cent.add(Contact,A,B);
-        codA.addContact(B,cent);
+        contact = cent.add(Contact, A, B);
+        codA.addContact(B, cent);
         contact.dispatchEnterEvent();
     }
-    isContact(A,B,world) {
+
+    isContact(A, B, world) {
         return A.get(Collider).contacts[B.id];
     }
-    deleteContactfunction (A,B) {
-        let contact = this.isContact(A,B);
+
+    deleteContactfunction(A, B) {
+        let contact = this.isContact(A, B);
         if (!contact) {
             return;
         }
@@ -75,6 +82,7 @@ class Collider extends Rect{
         let codA = A.get(Collider);
         codA.removeContact(B);
     }
+
     getFirstContact() {
         for (let i in this.contacts) {
             if (this.contacts[i]) {
@@ -82,14 +90,16 @@ class Collider extends Rect{
             }
         }
     }
+
     getFirstCollider() {
-        let contact =this.getFirstContact();
+        let contact = this.getFirstContact();
         if (!contact) return;
         contact = contact.get('Contact');
         if (!contact) return;
         return contact.getCollider(this.entity);
     }
-    removeContact(id){
+
+    removeContact(id) {
         let contact = this.contacts[id];
         if (contact) {
             this.collideCount--;
@@ -101,31 +111,36 @@ class Collider extends Rect{
             delete this.contacts[id];
         }
     }
-    setTag(){
+
+    setTag() {
         return this.tag;
     }
-    collide(collider,result=null,aabb = true) {
+
+    collide(collider, result = null, aabb = true) {
         return Collision(this, collider, result, aabb);
     }
-    onRemove(ent,ecs){
+
+    onRemove(ent, ecs) {
         if (this.world) {
             this.world.remove(this);
         }
     }
-    updateBorder(){
-        let cPolygon = this.getSibling('Polygon')||this.getSibling('Point');
+
+    updateBorder() {
+        let cPolygon = this.getSibling('Polygon') || this.getSibling('Point');
         let cCircle = this.getSibling('Circle');
-        cPolygon&&cPolygon._calculateCoords();
-        this.minX = cPolygon?cPolygon.minX:cCircle.x-cCircle.radius*cCircle.scale-this.padding;
-        this.maxX = cPolygon?cPolygon.maxX:cCircle.x+cCircle.radius*cCircle.scale+this.padding;
-        this.minY = cPolygon?cPolygon.minY:cCircle.y-cCircle.radius*cCircle.scale-this.padding;
-        this.maxY = cPolygon?cPolygon.maxY:cCircle.y+cCircle.radius*cCircle.scale+this.padding;
+        cPolygon && cPolygon._calculateCoords();
+        this.minX = cPolygon ? cPolygon.minX : cCircle.x - cCircle.radius * cCircle.scale - this.padding;
+        this.maxX = cPolygon ? cPolygon.maxX : cCircle.x + cCircle.radius * cCircle.scale + this.padding;
+        this.minY = cPolygon ? cPolygon.minY : cCircle.y - cCircle.radius * cCircle.scale - this.padding;
+        this.maxY = cPolygon ? cPolygon.maxY : cCircle.y + cCircle.radius * cCircle.scale + this.padding;
     }
+
     draw(context) {
-        const min_x  = this.minX;
-        const min_y  = this.minY;
-        const max_x  = this.maxX;
-        const max_y  = this.maxY;
+        const min_x = this.minX;
+        const min_y = this.minY;
+        const max_x = this.maxX;
+        const max_y = this.maxY;
 
         context.moveTo(min_x, min_y);
         context.lineTo(max_x, min_y);

@@ -2,25 +2,27 @@ const Rect = require('./Rect');
 const Entity = require('../Entity');
 const Component = require('../Component');
 
-class QuadTree extends Rect{
-    static defineName(){
+class QuadTree extends Rect {
+    static defineName() {
         return 'QuadTree';
     }
-    constructor(x,y,w,h,maxObject=8,maxLevel=4){
-        super(x-w/2,y-h/2,x+w/2,y+h/2);
+
+    constructor(x, y, w, h, maxObject = 8, maxLevel = 4) {
+        super(x - w / 2, y - h / 2, x + w / 2, y + h / 2);
         this.maxObject = maxObject;
         this.maxLevel = maxLevel;
-        this.root = new QuadBranch(x-w/2,y-h/2,x+w/2,y+h/2,0);
+        this.root = new QuadBranch(x - w / 2, y - h / 2, x + w / 2, y + h / 2, 0);
         this.colliders = [];
 
     }
-    remove(collider,updating=false){
+
+    remove(collider, updating = false) {
         if (collider instanceof Entity) {
             collider = collider.get('Collider');
         }
-        if(!updating) {
+        if (!updating) {
             const world = collider.quadWorld;
-            if(world && world !== this) {
+            if (world && world !== this) {
                 throw new Error('Collider belongs to another quad system');
             }
             collider.quadWorld = null;
@@ -28,21 +30,22 @@ class QuadTree extends Rect{
         }
         let tree = collider.quadTree;
         let index = tree.objects.indexOf(collider);
-        tree.objects.splice(index,1);
+        tree.objects.splice(index, 1);
         collider.quadTree = null;
         tree.tryCollapse(this.maxObject);
     }
-    insert(collider,updating = false){
-        if(!updating) {
+
+    insert(collider, updating = false) {
+        if (!updating) {
             const world = collider.quadWorld;
-            if(world && world !== this) {
+            if (world && world !== this) {
                 throw new Error('Collider belongs to another quad system');
             }
             if (collider instanceof Entity) {
                 collider = collider.get('Collider');
             }
             collider.updateBorder();
-            if (this.colliders.indexOf(collider)!==-1) {
+            if (this.colliders.indexOf(collider) !== -1) {
                 this.remove(collider);
                 this.insert(collider);
                 return;
@@ -52,14 +55,14 @@ class QuadTree extends Rect{
 
 
         }
-        return this.root.insert(collider,this.maxObject,this.maxLevel);
+        return this.root.insert(collider, this.maxObject, this.maxLevel);
     }
 
     potentials(collider) {
         return this.root.potentials(collider);
     }
 
-    traverse(cb){
+    traverse(cb) {
         if (!this.root) {
             return;
         }
@@ -77,12 +80,12 @@ class QuadTree extends Rect{
         }
     }
 
-    draw(context){
+    draw(context) {
         this.traverse(function (branch) {
-            const min_x  = branch.minX;
-            const min_y  = branch.minY;
-            const max_x  = branch.maxX;
-            const max_y  = branch.maxY;
+            const min_x = branch.minX;
+            const min_y = branch.minY;
+            const max_x = branch.maxX;
+            const max_y = branch.maxY;
 
             context.moveTo(min_x, min_y);
             context.lineTo(max_x, min_y);
@@ -94,8 +97,8 @@ class QuadTree extends Rect{
     }
 }
 
-class QuadBranch extends Rect{
-    static defineName(){
+class QuadBranch extends Rect {
+    static defineName() {
         return 'QuadTree';
     }
 
@@ -107,21 +110,21 @@ class QuadBranch extends Rect{
      * @param {Number} maxY
      * @param {Number} level
      */
-    constructor(minX,minY,maxX,maxY,level=0){
-        super(minX,minY,maxX,maxY);
-        this.level=level;
+    constructor(minX, minY, maxX, maxY, level = 0) {
+        super(minX, minY, maxX, maxY);
+        this.level = level;
         this.parent = null;
-        this.objects=[];
-        this.nodes=[];
+        this.objects = [];
+        this.nodes = [];
     }
 
-    remove(collider,max_object){
+    remove(collider, max_object) {
         if (collider instanceof Entity) {
             collider = collider.get('Collider');
         }
         let tree = collider.quadTree;
         let index = tree.objects.indexOf(collider);
-        tree.objects.splice(index,1);
+        tree.objects.splice(index, 1);
         collider.quadTree = null;
         tree.tryCollapse(max_object);
     }
@@ -136,54 +139,54 @@ class QuadBranch extends Rect{
      * @param {Number} level
      * @returns {QuadTree}
      */
-    createChild(minX,minY,maxX,maxY,level){
-        let ret = new QuadBranch(minX,minY,maxX,maxY,level);
+    createChild(minX, minY, maxX, maxY, level) {
+        let ret = new QuadBranch(minX, minY, maxX, maxY, level);
         ret.parent = this;
         return ret;
     }
 
-    static remove(collider){
+    static remove(collider) {
         if (collider instanceof Entity) {
             collider = collider.get('Collider');
         }
         let tree = collider.quadTree;
         let index = tree.objects.indexOf(collider);
-        tree.objects.splice(index,1);
+        tree.objects.splice(index, 1);
         collider.quadTree = null;
         tree.tryCollapse();
     }
 
-    get size(){
+    get size() {
         let ret = 0;
-        ret+=this.objects.length;
-        for (let i=0;i<this.nodes.length;i++) {
-            ret+=this.nodes[i].size;
+        ret += this.objects.length;
+        for (let i = 0; i < this.nodes.length; i++) {
+            ret += this.nodes[i].size;
         }
         return ret;
     }
 
-    get root(){
+    get root() {
         let parent = this;
-        while(parent.parent) {
+        while (parent.parent) {
             parent = parent.parent;
         }
         return parent;
     }
 
-    tryCollapse(max_object){
-        if (!this.parent||this.nodes.length) {
+    tryCollapse(max_object) {
+        if (!this.parent || this.nodes.length) {
             return;
         }
-        if (this.parent.size<max_object) {
+        if (this.parent.size < max_object) {
             this.parent.collapse();
         }
     }
 
-    collapse(){
-        for (let i=0;i<this.nodes.length;i++) {
+    collapse() {
+        for (let i = 0; i < this.nodes.length; i++) {
             let objects = this.nodes[i].objects;
 
-            for (let j=0;j<objects.length;j++) {
+            for (let j = 0; j < objects.length; j++) {
                 objects[j].quadTree = this;
             }
             this.objects.concat(objects);
@@ -193,23 +196,22 @@ class QuadBranch extends Rect{
     }
 
 
-
     /**
      * 插入碰撞体
      * @param {Entity} collider
      * @param {Number} max_object
      * @param {Number} max_level
      */
-    insert(collider,max_object,max_level){
+    insert(collider, max_object, max_level) {
         if (collider instanceof Entity) {
             collider = collider.get('Collider');
         }
-        let i=0;
+        let i = 0;
         let index;
-        if (typeof this.nodes[0]!=='undefined') {
+        if (typeof this.nodes[0] !== 'undefined') {
             index = this.getIndex(collider);
-            if (index!==-1) {
-                this.nodes[index].insert(collider,max_object,max_level);
+            if (index !== -1) {
+                this.nodes[index].insert(collider, max_object, max_level);
                 return;
             }
         }
@@ -219,14 +221,14 @@ class QuadBranch extends Rect{
         if (!max_object) {
             return;
         }
-        if (this.objects.length>max_object&&this.level<max_level) {
-            if (this.nodes[0]===undefined) {
+        if (this.objects.length > max_object && this.level < max_level) {
+            if (this.nodes[0] === undefined) {
                 this.split();
             }
-            while (i<this.objects.length) {
+            while (i < this.objects.length) {
                 index = this.getIndex(this.objects[i]);
-                if (index!== -1) {
-                    this.nodes[index].insert(this.objects.splice(i, 1)[0],max_object,max_level)
+                if (index !== -1) {
+                    this.nodes[index].insert(this.objects.splice(i, 1)[0], max_object, max_level)
                 } else {
                     i++;
                 }
@@ -245,15 +247,15 @@ class QuadBranch extends Rect{
         }
         let index = this.getIndex(collider);
         let returnObjects = this.objects;
-        if (typeof this.nodes[0]!=='undefined') {
+        if (typeof this.nodes[0] !== 'undefined') {
             //如果符合其中一个子对象集合,从子对象集合获取碰撞体
-            if (index!== -1) {
-                returnObjects=returnObjects.concat(
+            if (index !== -1) {
+                returnObjects = returnObjects.concat(
                     this.nodes[index].potentials(collider));
                 //如果不能符合子对象,遍历所有子对象获取碰撞体
             } else {
-                for (let i=0; i<this.nodes.length; i=i+1) {
-                    returnObjects=returnObjects.concat(
+                for (let i = 0; i < this.nodes.length; i = i + 1) {
+                    returnObjects = returnObjects.concat(
                         this.nodes[i].potentials(collider));
                 }
             }
@@ -264,21 +266,21 @@ class QuadBranch extends Rect{
     /**
      * 清理四叉树
      */
-    clear(){
+    clear() {
         this.objects = [];
-        for (let i=0;i<this.nodes.length;i++) {
-            if (typeof this.nodes[i]!=='undefined') {
+        for (let i = 0; i < this.nodes.length; i++) {
+            if (typeof this.nodes[i] !== 'undefined') {
                 this.nodes[i].clear();
             }
         }
-        this.nodes=[];
+        this.nodes = [];
     }
 
     /**
      * 分割四叉树
      */
-    split(){
-        const nextLevel = this.level+1;
+    split() {
+        const nextLevel = this.level + 1;
         const x = this.x;
         const y = this.y;
         const min_x = this.minX;
@@ -286,13 +288,13 @@ class QuadBranch extends Rect{
         const max_x = this.maxX;
         const max_y = this.maxY;
         this.nodes[0] = this.createChild(
-            min_x,min_y,x,y,nextLevel);
+            min_x, min_y, x, y, nextLevel);
         this.nodes[1] = this.createChild(
-            x,min_y,max_x,y,nextLevel);
+            x, min_y, max_x, y, nextLevel);
         this.nodes[2] = this.createChild(
-            min_x,y,x,max_y,nextLevel);
+            min_x, y, x, max_y, nextLevel);
         this.nodes[3] = this.createChild(
-            x,y,max_x,max_y,nextLevel);
+            x, y, max_x, max_y, nextLevel);
     }
 
     /**
@@ -300,7 +302,7 @@ class QuadBranch extends Rect{
      * @param {Collider} collider
      * @returns {number}
      */
-    getIndex(collider){
+    getIndex(collider) {
         if (collider instanceof Entity) {
             collider = collider.get('Collider');
         }
@@ -314,29 +316,28 @@ class QuadBranch extends Rect{
         const t_min_y = this.minY;
         const t_max_y = this.maxY;
         const x = this.x;
-        const y= this.y;
+        const y = this.y;
         // console.log(collider.getEntity().id,'c_min_x',c_min_x,'c_max_x',c_max_x,'c_min_y',c_min_y,'c_max_y',c_max_y);
         // console.log(collider.getEntity().id,'t_min_x',t_min_x,'t_max_x',t_max_x,'t_min_y',t_min_y,'t_max_y',t_max_y);
         // console.log(collider.getEntity().id,'x',x,'y',y);
 
-        const bottomQuadrant = c_min_y>t_min_y&&c_max_y<y,
-            topQuadrant = c_min_y>y&&c_min_y<t_max_y;
-        const leftQuadrant = c_min_x>t_min_x&&c_max_x<x,
-            rightQuadrant = c_min_x>x&&c_min_x<t_max_x;
+        const bottomQuadrant = c_min_y > t_min_y && c_max_y < y,
+            topQuadrant = c_min_y > y && c_min_y < t_max_y;
+        const leftQuadrant = c_min_x > t_min_x && c_max_x < x,
+            rightQuadrant = c_min_x > x && c_min_x < t_max_x;
         // console.log('bottomQuadrant',bottomQuadrant,'topQuadrant',topQuadrant,'leftQuadrant',leftQuadrant,'rightQuadrant',rightQuadrant);
 
         if (leftQuadrant) {
             if (bottomQuadrant) {
                 index = 0;
-            }
-            else if (topQuadrant) {
+            } else if (topQuadrant) {
                 index = 2;
             }
         } else if (rightQuadrant) {
             if (bottomQuadrant) {
                 index = 1;
             } else if (topQuadrant) {
-                index=3;
+                index = 3;
             }
         }
         return index;
