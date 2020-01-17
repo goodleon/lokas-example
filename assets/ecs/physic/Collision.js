@@ -1,16 +1,20 @@
+/**
+ * 只是一个碰撞检测的 纯函数??
+ * @type {Entity}
+ */
 const Entity = require('../Entity');
 /**
  * 圆形之间碰撞
- * @param {Collider} a
- * @param {Collider} b
- * @param {Contact} contact
+ * @param {CmpCollider} a
+ * @param {CmpCollider} b
+ * @param {CmpContact} contact
  * @returns {boolean}
  */
 module.exports = function (a, b, contact = null, aabb = true) {
-    const a_polygon = a.getSibling('Polygon') || a.getSibling('Point');
-    const b_polygon = b.getSibling('Polygon') || b.getSibling('Point');
-    const a_circle = a.getSibling('Circle');
-    const b_circle = b.getSibling('Circle');
+    const a_polygon = a.getSibling('CmpPolygon') || a.getSibling('CmpPoint');
+    const b_polygon = b.getSibling('CmpPolygon') || b.getSibling('CmpPoint');
+    const a_circle = a.getSibling('CmpCircle');
+    const b_circle = b.getSibling('CmpCircle');
     let collision = false;
 
     if (contact) {
@@ -51,8 +55,8 @@ function aabbAABB(a, b) {
 }
 
 function _aabbAABB(a, b) {
-    const a_polygon = a.get('Polygon') || a.get('Point');
-    const a_circle = a.get('Circle');
+    const a_polygon = a.get('CmpPolygon') || a.get('CmpPoint');
+    const a_circle = a.get('CmpCircle');
     const a_x = a_polygon ? 0 : a_circle.x;
     const a_y = a_polygon ? 0 : a_circle.y;
     const a_radius = a_polygon ? 0 : a_circle.radius * a_circle.scale;
@@ -61,8 +65,8 @@ function _aabbAABB(a, b) {
     const a_max_x = a_polygon ? a_polygon.maxX : a_x + a_radius;
     const a_max_y = a_polygon ? a_polygon.maxY : a_y + a_radius;
 
-    const b_polygon = b.get('Polygon') || b.get('Point');
-    const b_circle = b.get('Circle');
+    const b_polygon = b.get('CmpPolygon') || b.get('CmpPoint');
+    const b_circle = b.get('CmpCircle');
     const b_x = b_polygon ? 0 : b_circle.x;
     const b_y = b_polygon ? 0 : b_circle.y;
     const b_radius = b_polygon ? 0 : b_circle.radius * b_circle.scale;

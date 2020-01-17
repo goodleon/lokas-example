@@ -1,8 +1,8 @@
 const Component = require('../Component');
 
-class Contact extends Component {
+class CmpContact extends Component {
     static defineName() {
-        return 'Contact';
+        return 'CmpContact';
     }
 
     constructor(a, b, time) {
@@ -23,8 +23,8 @@ class Contact extends Component {
     }
 
     dispatchEnterEvent() {
-        let codA = this.a.get('Collider');
-        let codB = this.b.get('Collider');
+        let codA = this.a.get('CmpCollider');
+        let codB = this.b.get('CmpCollider');
         if (codA && codA.onCollisionEnter) {
             codA.onCollisionEnter(this.a, this.b)
         }
@@ -34,8 +34,8 @@ class Contact extends Component {
     }
 
     dispatchStayEvent() {
-        let codA = this.a.get('Collider');
-        let codB = this.b.get('Collider');
+        let codA = this.a.get('CmpCollider');
+        let codB = this.b.get('CmpCollider');
         if (codA && codA.onCollisionStay) {
             codA.onCollisionStay(this.a, this.b)
         }
@@ -45,8 +45,8 @@ class Contact extends Component {
     }
 
     dispatchExitEvent() {
-        let codA = this.a.get('Collider');
-        let codB = this.b.get('Collider');
+        let codA = this.a.get('CmpCollider');
+        let codB = this.b.get('CmpCollider');
         if (codA && codA.onCollisionExit) {
             codA.onCollisionExit(this.a, this.b)
         }
@@ -56,7 +56,7 @@ class Contact extends Component {
     }
 }
 
-module.exports = Contact;
+module.exports = CmpContact;
 
 
 

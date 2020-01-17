@@ -1,8 +1,8 @@
-const Polygon = require('./Polygon');
+const CmpPolygon = require('./CmpPolygon');
 
-class Point extends Polygon {
+class CmpPoint extends CmpPolygon {
     static defineName() {
-        return 'Point';
+        return 'CmpPoint';
     }
 
     constructor(x = 0, y = 0) {
@@ -12,4 +12,4 @@ class Point extends Polygon {
     }
 }
 
-module.exports = Point;
+module.exports = CmpPoint;

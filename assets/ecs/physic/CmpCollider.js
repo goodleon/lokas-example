@@ -3,12 +3,12 @@
  * @type {Rect}
  */
 const Rect = require('./Rect');
-const Contact = require('./Contact');
+const CmpContact = require('./CmpContact');
 const Collision = require('./Collision');
 
-class Collider extends Rect {
+class CmpCollider extends Rect {
     static defineName() {
-        return 'Collider';
+        return 'CmpCollider';
     }
 
     constructor(minX = 0, minY = 0, maxX = 0, maxY = 0, padding = 0) {
@@ -32,7 +32,7 @@ class Collider extends Rect {
             return;
         }
         this.contacts[entity.id] = contact;
-        let cod = entity.get(Collider);
+        let cod = entity.get(CmpCollider);
         cod.contacts[this.entity.id] = contact;
         cod.collideCount++;
         this.collideCount++;
@@ -57,20 +57,20 @@ class Collider extends Rect {
     createContact(ecs, A, B) {
         let contact = this.isContact(A, B);
         if (contact) {
-            contact.get(Contact).dispatchStayEvent();
+            contact.get(CmpContact).dispatchStayEvent();
             return;
         }
-        let codA = A.get(Collider);
+        let codA = A.get(CmpCollider);
 
 
         let cent = ecs.createEntity();
-        contact = cent.add(Contact, A, B);
+        contact = cent.add(CmpContact, A, B);
         codA.addContact(B, cent);
         contact.dispatchEnterEvent();
     }
 
     isContact(A, B, world) {
-        return A.get(Collider).contacts[B.id];
+        return A.get(CmpCollider).contacts[B.id];
     }
 
     deleteContactfunction(A, B) {
@@ -78,8 +78,8 @@ class Collider extends Rect {
         if (!contact) {
             return;
         }
-        contact.get(Contact).dispatchExitEvent();
-        let codA = A.get(Collider);
+        contact.get(CmpContact).dispatchExitEvent();
+        let codA = A.get(CmpCollider);
         codA.removeContact(B);
     }
 
@@ -94,7 +94,7 @@ class Collider extends Rect {
     getFirstCollider() {
         let contact = this.getFirstContact();
         if (!contact) return;
-        contact = contact.get('Contact');
+        contact = contact.get('CmpContact');
         if (!contact) return;
         return contact.getCollider(this.entity);
     }
@@ -105,7 +105,7 @@ class Collider extends Rect {
             this.collideCount--;
             contact.destroy();
             let ent = this.getEntity();
-            let cod = contact.get('Contact').getCollider(ent).get('Collider');
+            let cod = contact.get('CmpContact').getCollider(ent).get('CmpCollider');
             cod.collideCount--;
             delete cod.contacts[ent.id];
             delete this.contacts[id];
@@ -127,8 +127,8 @@ class Collider extends Rect {
     }
 
     updateBorder() {
-        let cPolygon = this.getSibling('Polygon') || this.getSibling('Point');
-        let cCircle = this.getSibling('Circle');
+        let cPolygon = this.getSibling('CmpPolygon') || this.getSibling('CmpPoint');
+        let cCircle = this.getSibling('CmpCircle');
         cPolygon && cPolygon._calculateCoords();
         this.minX = cPolygon ? cPolygon.minX : cCircle.x - cCircle.radius * cCircle.scale - this.padding;
         this.maxX = cPolygon ? cPolygon.maxX : cCircle.x + cCircle.radius * cCircle.scale + this.padding;
@@ -151,4 +151,4 @@ class Collider extends Rect {
     }
 }
 
-module.exports = Collider;
+module.exports = CmpCollider;

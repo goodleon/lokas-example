@@ -1,9 +1,9 @@
-const Circle = require('Circle');
-const Polygon = require('Polygon');
-const Collider = require('Collider');
-const Contact = require('Contact');
-const BVTree = require('BVTree');
-const QuadTree = require('QuadTree');
+const CmpCircle = require('CmpCircle');
+const CmpPolygon = require('CmpPolygon');
+const CmpCollider = require('CmpCollider');
+const CmpContact = require('CmpContact');
+const CmpBVTree = require('CmpBVTree');
+const CmpQuadTree = require('CmpQuadTree');
 const Component = require('Component');
 const {MovingSystem} = require('MovingSystem');
 const {CmpPosition, CmpVelocity, CmpAccelation} = require("BaseComponents");
@@ -19,8 +19,8 @@ class PhysicWorld extends Component {
 
     constructor() {
         super();
-        this.quadTree = new QuadTree(0, 0, width, height);
-        this.bvTree = new BVTree();
+        this.quadTree = new CmpQuadTree(0, 0, width, height);
+        this.bvTree = new CmpBVTree();
         this.quad = false;
     }
 
@@ -103,9 +103,9 @@ class Canvas extends Component {
 module.exports = {
     name: 'PhysicTest',
     onLoad: function (ecs) {
-        ecs.registerComponent(Circle);
-        ecs.registerComponent(Polygon);
-        ecs.registerComponent(Collider);
+        ecs.registerComponent(CmpCircle);
+        ecs.registerComponent(CmpPolygon);
+        ecs.registerComponent(CmpCollider);
         ecs.registerSingleton(Canvas);
         ecs.registerSingleton(PhysicWorld);
         ecs.registerComponent(CmpPosition);
@@ -114,9 +114,9 @@ module.exports = {
         ecs.registerSystem(MovingSystem);
         ecs.registerSystem({
             name: 'updating',
-            components: [Collider, [Circle, Polygon]],
+            components: [CmpCollider, [CmpCircle, CmpPolygon]],
             update: function (ent, dt, now, ecs) {
-                let cCollider = ent.get('Collider');
+                let cCollider = ent.get('CmpCollider');
                 cCollider.updateBorder();
                 let world = ecs.getSingleton(PhysicWorld);
                 world.remove(cCollider, true);
@@ -127,18 +127,18 @@ module.exports = {
         ecs.registerSystem({
             name: 'collision',
             enable: false,
-            components: [Collider, [Circle, Polygon], CmpVelocity],
+            components: [CmpCollider, [CmpCircle, CmpPolygon], CmpVelocity],
             update: function (ent, dt, now, ecs) {
                 let world = ecs.getSingleton(PhysicWorld);
-                let colliderA = ent.get('Collider');
-                let posA = ent.get('Polygon') || ent.get('Circle');
+                let colliderA = ent.get('CmpCollider');
+                let posA = ent.get('CmpPolygon') || ent.get('CmpCircle');
                 let velA = ent.get('CmpVelocity') || ent.get('CmpVelocity');
-                let result = new Contact();
+                let result = new CmpContact();
                 let potentials = world.potentials(ent);
                 for (const colliderB of potentials) {
                     if (colliderA.collide(colliderB, result)) {
 
-                        let posB = colliderB.getSibling('Polygon') || colliderB.getSibling('Circle');
+                        let posB = colliderB.getSibling('CmpPolygon') || colliderB.getSibling('CmpCircle');
                         let velB = colliderB.getSibling('CmpVelocity') || colliderB.getSibling('CmpVelocity');
                         posA.x -= result.overlap * result.overlap_x;
                         posA.y -= result.overlap * result.overlap_y;
@@ -171,18 +171,18 @@ module.exports = {
 
         ecs.registerSystem({
             name: 'shapeRenderer',
-            components: [[Circle, Polygon]],
+            components: [[CmpCircle, CmpPolygon]],
             beforeUpdate: function (dt, now, ecs) {
                 if (this.getSize() < 1200) {
-                    ecs.spawnEntity('Circle', Dice.rng(-300, 300), Dice.rng(-300, 300), Dice.rng(3, 8), 1);
-                    ecs.spawnEntity('Polygon', Dice.rng(-300, 300), Dice.rng(-300, 300), [[-4, -4], [4, -4], [4, 4], [-4, 4]], Dice.rng(0, 3), 1);
+                    ecs.spawnEntity('CmpCircle', Dice.rng(-300, 300), Dice.rng(-300, 300), Dice.rng(3, 8), 1);
+                    ecs.spawnEntity('CmpPolygon', Dice.rng(-300, 300), Dice.rng(-300, 300), [[-4, -4], [4, -4], [4, 4], [-4, 4]], Dice.rng(0, 3), 1);
                 }
                 let cCanvas = ecs.getSingleton('Canvas');
                 cCanvas.clear();
             },
             update: (ent, dt, now, ecs) => {
-                let cPolygon = ent.get('Polygon');
-                let cCircle = ent.get('Circle');
+                let cPolygon = ent.get('CmpPolygon');
+                let cCircle = ent.get('CmpCircle');
                 let cCanvas = ecs.getSingleton('Canvas');
                 let context = cCanvas.getContext(Dice.rngInt(0, 6));
                 cPolygon && cPolygon.draw(context);
@@ -197,25 +197,25 @@ module.exports = {
             }
         });
 
-        ecs.setSpawner('Polygon', function (ecs, x, y, points, rotation, scaleX, scaleY) {
+        ecs.setSpawner('CmpPolygon', function (ecs, x, y, points, rotation, scaleX, scaleY) {
             let ent = ecs.createEntity();
-            ent.add(Polygon, x, y, points, rotation, scaleX, scaleY);
-            ent.add(Collider);
+            ent.add(CmpPolygon, x, y, points, rotation, scaleX, scaleY);
+            ent.add(CmpCollider);
             ecs.getSingleton(PhysicWorld).insert(ent);
             return ent;
         });
         ecs.setSpawner('Polygon1', function (ecs, x, y, points, rotation, scaleX, scaleY) {
             let ent = ecs.createEntity();
-            ent.add(Polygon, x, y, points, rotation, scaleX, scaleY);
-            ent.add(Collider);
+            ent.add(CmpPolygon, x, y, points, rotation, scaleX, scaleY);
+            ent.add(CmpCollider);
             ecs.getSingleton(PhysicWorld).insert(ent);
             return ent;
         });
 
-        ecs.setSpawner('Circle', function (ecs, x, y, radius, scale) {
+        ecs.setSpawner('CmpCircle', function (ecs, x, y, radius, scale) {
             let ent = ecs.createEntity();
-            ent.add(Circle, x, y, radius, scale);
-            ent.add(Collider);
+            ent.add(CmpCircle, x, y, radius, scale);
+            ent.add(CmpCollider);
             let speed = ent.add(CmpVelocity, 1, 1);
             speed.angle = Dice.rng(0, 360);
             speed.speed = Dice.rng(34, 60);

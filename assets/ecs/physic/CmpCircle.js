@@ -1,8 +1,8 @@
 const Component = require('../Component');
 
-class Circle extends Component {
+class CmpCircle extends Component {
     static defineName() {
-        return 'Circle';
+        return 'CmpCircle';
     }
 
     constructor(x = 0, y = 0, radius = 0, scale = 1) {
@@ -18,4 +18,4 @@ class Circle extends Component {
     }
 }
 
-module.exports = Circle;
+module.exports = CmpCircle;

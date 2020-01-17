@@ -1,6 +1,6 @@
 const {CmpPosition, CmpVelocity, CmpAccelation} = require("./BaseComponents");
-const Circle = require('./Circle');
-const Polygon = require('./Polygon');
+const CmpCircle = require('./CmpCircle');
+const CmpPolygon = require('./CmpPolygon');
 
 let MovingSystem = [
     function AccelSubSystem() {
@@ -15,10 +15,10 @@ let MovingSystem = [
     },
     function MoveSubSystem() {
         this.name = 'MoveSubSystem';
-        this.components = [[Circle, Polygon, CmpPosition], CmpVelocity];
+        this.components = [[CmpCircle, CmpPolygon, CmpPosition], CmpVelocity];
         this.update = function (ent, dt) {
-            let cPolygon = ent.get('Polygon');
-            let cCircle = ent.get('Circle');
+            let cPolygon = ent.get('CmpPolygon');
+            let cCircle = ent.get('CmpCircle');
             let cPosition = ent.get('CmpPosition');
             let cVelocity = ent.get('CmpVelocity');
             let pos = cPolygon || cCircle || cPosition;
@@ -34,8 +34,8 @@ let MovingModule = {
         ecs.registerComponent('CmpPosition', CmpPosition, 300, 10);
         ecs.registerComponent('CmpVelocity', CmpVelocity, 300, 10);
         ecs.registerComponent('CmpAccelation', CmpAccelation, 300, 10);
-        ecs.registerComponent('Polygon', Polygon, 200, 10);
-        ecs.registerComponent('Circle', Circle, 200, 10);
+        ecs.registerComponent('CmpPolygon', CmpPolygon, 200, 10);
+        ecs.registerComponent('CmpCircle', CmpCircle, 200, 10);
         ecs.registerSystem(MovingSystem);
     }
 };

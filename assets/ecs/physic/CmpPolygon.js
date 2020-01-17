@@ -1,8 +1,8 @@
 const Component = require('../Component');
 
-class Polygon extends Component {
+class CmpPolygon extends Component {
     static defineName() {
-        return 'Polygon';
+        return 'CmpPolygon';
     }
 
     constructor(x = 0, y = 0, points = [], angle = 0, scale_x = 1, scale_y = 1, padding = 0) {
@@ -27,7 +27,7 @@ class Polygon extends Component {
         this._normals = null;
         this._dirty_coords = true;
         this._dirty_normals = true;
-        Polygon.prototype.setPoints.call(this, points);
+        CmpPolygon.prototype.setPoints.call(this, points);
     }
 
     setPoints(new_points) {
@@ -161,4 +161,4 @@ class Polygon extends Component {
 
 }
 
-module.exports = Polygon;
+module.exports = CmpPolygon;

@@ -1,12 +1,12 @@
 const Rect = require('./Rect');
-const Collider = require('./Collider');
+const CmpCollider = require('./CmpCollider');
 const Entity = require('../Entity');
 const Component = require('../Component');
 const Collision = require('Collision');
 
 const branch_pool = [];
 
-class BVBranch extends Rect {
+class CmpBVBranch extends Rect {
     constructor(minX = 0, maxX = 0, minY = 0, maxY = 0, world = null) {
         super(minX, maxX, minY, maxY);
         this.parent = null;
@@ -17,9 +17,9 @@ class BVBranch extends Rect {
     }
 }
 
-class BVTree extends Component {
+class CmpBVTree extends Component {
     static defineName() {
-        return 'BVTree';
+        return 'CmpBVTree';
     }
 
     static recycle(branch) {
@@ -40,7 +40,7 @@ class BVTree extends Component {
         if (branch_pool.length) {
             ret = branch_pool.pop();
         } else {
-            ret = new BVBranch(minX, maxX, minY, maxY);
+            ret = new CmpBVBranch(minX, maxX, minY, maxY);
         }
         ret.world = this;
         return ret;
@@ -48,18 +48,18 @@ class BVTree extends Component {
 
     insert(collider, updating = false) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         if (!updating) {
             const world = collider.world;
             if (world && world !== this) {
-                throw new Error('Collider belongs to another collision system');
+                throw new Error('CmpCollider belongs to another collision system');
             }
             this.colliders.push(collider);
             collider.world = this;
         }
-        let cPolygon = collider.getSibling('Polygon') || collider.getSibling('Point');
-        let cCircle = collider.getSibling('Circle');
+        let cPolygon = collider.getSibling('CmpPolygon') || collider.getSibling('CmpPoint');
+        let cCircle = collider.getSibling('CmpCircle');
 
         const body_x = cPolygon ? cPolygon.x : cCircle.x;
         const body_y = cPolygon ? cPolygon.y : cCircle.y;
@@ -145,12 +145,12 @@ class BVTree extends Component {
 
     remove(collider, updating = false) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         if (!updating) {
             const world = collider.world;
             if (world && world !== this) {
-                throw new Error('Collider belongs to another collision system');
+                throw new Error('CmpCollider belongs to another collision system');
             }
             collider.world = null;
             this.colliders.splice(this.colliders.indexOf(collider), 1);
@@ -206,8 +206,8 @@ class BVTree extends Component {
 
             if (!update) {
 
-                let cPolygon = collider.getSibling('Polygon') || collider.getSibling('Point');
-                let cCircle = collider.getSibling('Circle');
+                let cPolygon = collider.getSibling('CmpPolygon') || collider.getSibling('CmpPoint');
+                let cCircle = collider.getSibling('CmpCircle');
 
                 if (cPolygon && collider.getEntity().isDirty()) {
                     cPolygon._calculateCoords();
@@ -234,7 +234,7 @@ class BVTree extends Component {
 
     potentials(collider) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         const results = [];
         const min_x = collider.minX;
@@ -355,4 +355,4 @@ class BVTree extends Component {
     }
 }
 
-module.exports = BVTree;
+module.exports = CmpBVTree;

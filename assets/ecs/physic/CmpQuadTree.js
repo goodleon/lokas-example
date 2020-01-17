@@ -2,9 +2,9 @@ const Rect = require('./Rect');
 const Entity = require('../Entity');
 const Component = require('../Component');
 
-class QuadTree extends Rect {
+class CmpQuadTree extends Rect {
     static defineName() {
-        return 'QuadTree';
+        return 'CmpQuadTree';
     }
 
     constructor(x, y, w, h, maxObject = 8, maxLevel = 4) {
@@ -18,12 +18,12 @@ class QuadTree extends Rect {
 
     remove(collider, updating = false) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         if (!updating) {
             const world = collider.quadWorld;
             if (world && world !== this) {
-                throw new Error('Collider belongs to another quad system');
+                throw new Error('CmpCollider belongs to another quad system');
             }
             collider.quadWorld = null;
             this.colliders.splice(this.colliders.indexOf(collider), 1);
@@ -39,10 +39,10 @@ class QuadTree extends Rect {
         if (!updating) {
             const world = collider.quadWorld;
             if (world && world !== this) {
-                throw new Error('Collider belongs to another quad system');
+                throw new Error('CmpCollider belongs to another quad system');
             }
             if (collider instanceof Entity) {
-                collider = collider.get('Collider');
+                collider = collider.get('CmpCollider');
             }
             collider.updateBorder();
             if (this.colliders.indexOf(collider) !== -1) {
@@ -99,7 +99,7 @@ class QuadTree extends Rect {
 
 class QuadBranch extends Rect {
     static defineName() {
-        return 'QuadTree';
+        return 'CmpQuadTree';
     }
 
     /**
@@ -120,7 +120,7 @@ class QuadBranch extends Rect {
 
     remove(collider, max_object) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         let tree = collider.quadTree;
         let index = tree.objects.indexOf(collider);
@@ -137,7 +137,7 @@ class QuadBranch extends Rect {
      * @param {Number} maxX
      * @param {Number} maxY
      * @param {Number} level
-     * @returns {QuadTree}
+     * @returns {CmpQuadTree}
      */
     createChild(minX, minY, maxX, maxY, level) {
         let ret = new QuadBranch(minX, minY, maxX, maxY, level);
@@ -147,7 +147,7 @@ class QuadBranch extends Rect {
 
     static remove(collider) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         let tree = collider.quadTree;
         let index = tree.objects.indexOf(collider);
@@ -204,7 +204,7 @@ class QuadBranch extends Rect {
      */
     insert(collider, max_object, max_level) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         let i = 0;
         let index;
@@ -243,7 +243,7 @@ class QuadBranch extends Rect {
      */
     potentials(collider) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         let index = this.getIndex(collider);
         let returnObjects = this.objects;
@@ -299,12 +299,12 @@ class QuadBranch extends Rect {
 
     /**
      * 判断插入的碰撞体在当前树的象限
-     * @param {Collider} collider
+     * @param {CmpCollider} collider
      * @returns {number}
      */
     getIndex(collider) {
         if (collider instanceof Entity) {
-            collider = collider.get('Collider');
+            collider = collider.get('CmpCollider');
         }
         let index = -1;
         const c_min_x = collider.minX;
@@ -344,4 +344,4 @@ class QuadBranch extends Rect {
     }
 }
 
-module.exports = QuadTree;
+module.exports = CmpQuadTree;
