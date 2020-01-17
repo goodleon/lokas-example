@@ -1,6 +1,5 @@
 const ECS = require('ECS');
 const PhysicTest = require('PhysicTest');
-const Component = require('Component');
 
 cc.macro.BATCH_VERTEX_COUNT = 400000;
 
