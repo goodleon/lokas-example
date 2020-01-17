@@ -1,5 +1,5 @@
 /**
- * Class for managing events.->该类来管理事件。
+ * Class for managing events.->该类来管理 event事件。
  * Can be extended to provide event functionality in other classes.
  * 可以扩展为在其他类中提供事件功能。
  * @class EventEmitter Manages event registering and emitting.
@@ -16,7 +16,7 @@ var originalGlobalValue = exports.EventEmitter; //
 
 /**
  * Finds the index of the listener for the event in its storage array.
- *
+ * 查找事件在其存储阵列中的侦听器的索引。
  * @param {Function[]} listeners Array of listeners to search through.
  * @param {Function} listener Method to look for.
  * @return {Number} Index of the specified listener, -1 if not found
@@ -34,8 +34,9 @@ function indexOfListener(listeners, listener) {
 }
 
 /**
+ * 别名
  * Alias a method while keeping the context correct, to allow for overwriting of target method.
- *
+ * 在保持上下文正确的情况下别名的方法，以允许覆盖目标方法。
  * @param {String} name The name of the target method.
  * @return {Function} The aliased method
  * @api private

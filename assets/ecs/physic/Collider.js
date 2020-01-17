@@ -1,3 +1,7 @@
+/**
+ * 碰撞机
+ * @type {Rect}
+ */
 const Rect = require('./Rect');
 const Contact = require('./Contact');
 const Collision = require('./Collision');

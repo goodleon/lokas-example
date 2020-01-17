@@ -18,22 +18,22 @@ const EventEmitter = require('./event-emmiter');
  */
 
 let Entity = function (ea, id, sync) {
-    this._components = {};          //组件<Component>数组
+    this._components = {};          //组件<Component>数组---这个entity 中的组件组
     this._ecs = ea;                 //实体管理器<ECS>对象引用
     this._id = id;                  //实体<Entity>ID对象的标记
-    this._step = 0;                 //当前步数
+    this._step = 0;                 //当前步数?? 啥用
     this._dirty = true;            //脏标记
     this._tags = [];                //标签
     this._owner = 0;
     this._lastStep = 0;             //上一次的步数
-    this._lastSnapshot = null;      //上一步的快照
-    this._snapshot = null;          //当前步的快照
+    this._lastSnapshot = null;      //上一步的快照 ??
+    this._snapshot = null;          //当前步的快照 ??
     this._onDestroy = false;        //移除标记
     this._removeMarks = [];
     this._addMarks = [];
     this._modifyMarks = [];
-    this.__unserializeEntityCount = 0;
-    this._eventListener = new EventEmitter();
+    this.__unserializeEntityCount = 0; // 是 反序列化 吗??
+    this._eventListener = new EventEmitter(); // 事件监听还是发射
 };
 
 Entity.prototype.getECS = function () {
@@ -595,14 +595,32 @@ Entity.prototype.add = function (comp) {
 };
 
 
+/**
+ * 事件监听 once
+ * @param evt
+ * @param cb
+ * @returns {*}
+ */
 Entity.prototype.once = function (evt, cb) {
     return this._eventListener.once(evt, cb)
 };
 
+/**
+ * 持续事件监听
+ * @param evt
+ * @param cb
+ * @returns {*}
+ */
 Entity.prototype.on = function (evt, cb) {
     return this._eventListener.on(evt, cb)
 };
 
+/**
+ *  关闭事件监听
+ * @param evt
+ * @param cb
+ * @returns {*}
+ */
 Entity.prototype.off = function (evt, cb) {
     if (cb) {
         return this._eventListener.off(evt, cb);
@@ -610,15 +628,26 @@ Entity.prototype.off = function (evt, cb) {
     return this._eventListener.removeAllListeners(evt);
 };
 
+/**
+ * 发射 event
+ * @param evt
+ * @returns {*}
+ */
 Entity.prototype.emit = function (evt) {
     return this._eventListener.emit.apply(this._eventListener, arguments);
 };
 
+/**
+ *
+ * @param compName
+ * @returns {boolean}
+ */
 Entity.prototype.isComponentDirty = function (compName) {
     return this._modifyMarks.indexOf(compName) !== -1 || this._addMarks.indexOf(compName) !== -1 || this._removeMarks.indexOf(compName) !== -1;
 };
 /**
  * 移除实体的一个组件
+ * @param comp
  */
 Entity.prototype.remove = function (comp) {
     let type = ECSUtil.getComponentType(comp);
@@ -650,13 +679,19 @@ Entity.prototype.remove = function (comp) {
     }
     logger.error('组件不存在');
 };
+
 /**
  * 标记一个实体<Entity>为删除状态
+ * 延迟移除
  */
 Entity.prototype.destroy = function () {
     this._onDestroy = true;
     this._ecs.removeEntity(this);
 };
+
+/**
+ * 立即移除一个 entity
+ */
 Entity.prototype.destroyInstant = function () {
     this._onDestroy = true;
     this._ecs.removeEntityInstant(this);

@@ -1,3 +1,6 @@
+/**
+ *
+ */
 class Component {
     static defineName() {
         return 'Component';
@@ -15,12 +18,21 @@ class Component {
         return this.constructor.defineName();
     }
 
+    /**
+     * 获取当前 组件 的实体上面的同级组件
+     * @param comp
+     * @returns {*}
+     */
     getSibling(comp) {
         if (this._entity) {
             return this._entity.get(comp);
         }
     }
 
+    /**
+     * 设置 当前组件的 实体
+     * @param ent
+     */
     setEntity(ent) {
         this._entity = ent;
     }
@@ -29,6 +41,10 @@ class Component {
         return this._entity;
     }
 
+    /**
+     * 获得全局ECS对像
+     * @returns {*}
+     */
     getECS() {
         if (this._entity) {
             return this._entity.getECS();

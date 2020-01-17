@@ -34,7 +34,7 @@ class ECS {
         }
         this._eventListener = new EventEmitter();
         /**基础变量*/
-        this._entityPool = {};              //实体<Entity>池
+        this._entityPool = {};              //实体<Entity>池 eg. this._entityPool[id] = ent;
         this._componentPools = {};          //各种组件池<ComponentPool>容器
         this._groups = {};                  //各种集合<Group>容器,组件<Component>数组为键值
         this._cachedGroups = {};            //单个组件<Component>为键值的集合<Group>缓存
@@ -43,9 +43,9 @@ class ECS {
         this._singleton = null;
 
         /**ID分配和生命周期变量*/
-        this._index = 0;                            //实体<Entity>ID分配变量
+        this._indexServer = 0;                            //实体<Entity>ID分配变量
         this._indexClient = 0;                      //实体<Entity>ID分配变量
-        this._server = opt.server || false;           //客户端的ID从Max_Long开始自减,服务器的ID从0开始自增
+        this._server = opt.server || false;           //客户端的ID从 Max_Long 开始自减,服务器的ID从0开始自增
         this._enabled = false;
         this._ecsReadyDestroy = false;
 
@@ -57,9 +57,9 @@ class ECS {
         this._timeOffset = 0;
         this._dirty = true;                //整个系统的脏标记d
         this._dirtyEntities = [];           //这轮的脏标记entity
-        this._newEntities = [];
+        this._newEntities = []; // 新增 实体组---作用未知 wcx eg. this._newEntities.push(ent);
         this._toDestroyEntities = [];        //在这轮遍历中要删除的entity队列
-        this._toDestroyEntityIDs = [];
+        this._toDestroyEntityIDs = [];       //要删除的entity ID 队列
         this.setupUpdateFunc();
 
         this._snapInterval = opt.snapInterval || 0;    //全实体快照时间
@@ -83,7 +83,7 @@ class ECS {
         this._componentDefineHash = 0;      //服务器组件hash
         this._compCode = opt.compCode;   //是否加密组件名
         this.rendererMap = {};
-        this.rendererArray = [];
+        this.rendererArray = []; // render array
         this.modelMap = {};
 
         this._commands = {};                //注册的命令组件
@@ -258,14 +258,32 @@ pro.offState = function (state, cb) {
     this._stateMachine.off(state, cb);
 };
 
+/**
+ * 监听一次
+ * @param evt
+ * @param cb
+ * @returns {*}
+ */
 pro.once = function (evt, cb) {
     return this._eventListener.once(evt, cb)
 };
 
+/**
+ * 持续监听
+ * @param evt
+ * @param cb
+ * @returns {*}
+ */
 pro.on = function (evt, cb) {
     return this._eventListener.on(evt, cb)
 };
 
+/**
+ * 关闭监听
+ * @param evt
+ * @param cb
+ * @returns {*}
+ */
 pro.off = function (evt, cb) {
     if (cb) {
         return this._eventListener.off(evt, cb);
@@ -273,6 +291,11 @@ pro.off = function (evt, cb) {
     return this._eventListener.removeAllListeners(evt);
 };
 
+/**
+ * 发射一次 event
+ * @param evt
+ * @returns {*}
+ */
 pro.emit = function (evt) {
     return this._eventListener.emit.apply(this._eventListener, arguments);
 };
@@ -1072,6 +1095,11 @@ pro.lateAdd = function (comp) {
     }
 };
 
+/**
+ * 渲染component吗?
+ * @param comp
+ * @returns {*}
+ */
 pro.getComponentRenderer = function (comp) {
     return this.rendererMap[ECSUtil.getComponentType(comp)];
 };
@@ -1116,6 +1144,7 @@ pro.getSingleton = function (Component, force) {
 
 /**
  * 生成一个新的ID来创建一个实体<Entity>
+ * 会自动加入 _newEntities 与 _entityPool
  * @returns {Entity}
  */
 pro.createEntity = function (id) {
@@ -1124,6 +1153,7 @@ pro.createEntity = function (id) {
         throw new Error(id + ' entity already exist');
     }
     this._dirty = true;
+
     let ent = new Entity(this, id);
     this._newEntities.push(ent);
     this._entityPool[id] = ent;
@@ -1131,7 +1161,7 @@ pro.createEntity = function (id) {
 };
 
 /**
- *
+ * 传入id判断 实体是否存在 wcx
  * @param id
  * @return {*}
  */
@@ -1139,13 +1169,19 @@ pro.hasEntity = function (id) {
     return this._entityPool[id];
 };
 
+/**
+ * 传入id 从entity pool 中获取 entity wcx
+ * @param id
+ * @param a
+ * @returns {*}
+ */
 pro.getEntity = function (id, a) {
     return this._entityPool[id];
 };
 
 /**
  * 立即移除一个实体<Entity>,并从所有集合<Group>中移除
- * @param ent
+ * @param ent -> 可以ID也可为 object
  */
 pro.removeEntityInstant = function (ent) {
     let entity = ent;
@@ -1153,9 +1189,10 @@ pro.removeEntityInstant = function (ent) {
         entity = this._entityPool[ent];
     }
     if (!entity) {
-        //logger.error('Entity不存在');
+        logger.error('Entity不存在');
         return;
     }
+
     let id = entity.id;
     for (let i in this._groups) {
         if (!this._groups.hasOwnProperty(i)) {
@@ -1168,13 +1205,19 @@ pro.removeEntityInstant = function (ent) {
     delete this._entityPool[id];
 };
 
+
+/**
+ * 移除一个entity
+ * @param ent -->可为 ID 也可为object
+ * @returns {*}
+ */
 pro.removeEntity = function (ent) {
     let entity = ent;
     if (ECSUtil.isNumber(ent)) {
         entity = this._entityPool[ent];
     }
     if (!entity) {
-        //logger.error('Entity不存在');
+        logger.error('Entity不存在');
         return;
     }
     this._dirty = true;
@@ -1338,7 +1381,7 @@ pro.registerGroups = function (compGroups) {
             group = new Group(hashes[i]);
             this._groups[hash] = group;
         }
-        if (this._index > 0) {
+        if (this._indexServer > 0) {
             for (let i in this._entityPool) {
                 // if (!this._entityPool.hasOwnProperty(i)) {
                 //     continue;
@@ -1351,7 +1394,7 @@ pro.registerGroups = function (compGroups) {
     return groups;
 };
 /**
- * 注册系统到<ECS>
+ * 注册 system 到<ECS>
  * @param system
  */
 pro.registerSystem = function (system) {
@@ -1450,10 +1493,14 @@ pro.getSystem = function (name) {
     }
 };
 
+/**
+ * 生成一个 ID-->客户端的ID从Max_Long开始自减,服务器的ID从0开始自增
+ * @returns {number}
+ */
 pro.generateID = function () {
     if (this._server) {
-        this._index++;
-        return this._index;
+        this._indexServer++;
+        return this._indexServer;
     } else {
         this._indexClient--;
         return this._indexClient;
@@ -1566,7 +1613,7 @@ pro._destroy = function () {
     this._cachedGroups = {};          //单个组件<Component>为键值的集合<Group>缓存
     this._systems = [];               //各个系统和监听集合
     this._toDestroyEntities = [];    //在这轮遍历中要删除的entity队列
-    this._index = 0;                  //实体<Entity>ID分配变量
+    this._indexServer = 0;                  //实体<Entity>ID分配变量
     this._entityCount = 0;            //实体数量
     this._addSystemCount = 0;
     this._objContainer = {};

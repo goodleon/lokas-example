@@ -133,6 +133,9 @@ class Vector extends Component{
     }
 }
 
+/**
+ * 坐标
+ */
 class Position extends Vector{
     static defineName(){
         return 'Position';
@@ -142,6 +145,9 @@ class Position extends Vector{
     }
 }
 
+/**
+ * 运动 向量
+ */
 class Velocity extends Vector{
     static defineName(){
         return 'Velocity';

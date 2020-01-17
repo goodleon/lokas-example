@@ -1,3 +1,9 @@
+/**
+ *
+ * @param ecs
+ * @param opt
+ * @constructor
+ */
 let System = function (ecs, opt) {
     this.ecs = ecs;
     this.desc = opt.desc;
