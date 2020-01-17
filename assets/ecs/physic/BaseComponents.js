@@ -2,9 +2,9 @@ const ECSUtil = require('../ECSUtil');
 const nbt = require('../binary/nbt');
 const Component = require('../Component');
 
-class Vector extends Component{
+class CmpVector extends Component{
     static defineName(){
-        return 'Vector';
+        return 'CmpVector';
     }
     constructor(x, y, z){
         super();
@@ -136,9 +136,9 @@ class Vector extends Component{
 /**
  * 坐标
  */
-class Position extends Vector{
+class CmpPosition extends CmpVector{
     static defineName(){
-        return 'Position';
+        return 'CmpPosition';
     }
     constructor(x,y,z){
         super(x,y,z);
@@ -148,9 +148,9 @@ class Position extends Vector{
 /**
  * 运动 向量
  */
-class Velocity extends Vector{
+class CmpVelocity extends CmpVector{
     static defineName(){
-        return 'Velocity';
+        return 'CmpVelocity';
     }
     constructor(x,y,z){
         super(x,y,z);
@@ -163,9 +163,9 @@ class Velocity extends Vector{
     }
 }
 
-class Accelation extends Vector{
+class CmpAccelation extends CmpVector{
     static defineName(){
-        return 'Accelation';
+        return 'CmpAccelation';
     }
     constructor(x,y,z){
         super(x,y,z);
@@ -204,9 +204,9 @@ class Size extends Component{
 }
 
 
-class TimeStamp extends Component{
+class CmpTimeStamp extends Component{
     static defineName(){
-        return 'TimeStamp';
+        return 'CmpTimeStamp';
     }
     constructor(time){
         super();
@@ -221,14 +221,14 @@ class TimeStamp extends Component{
 
 
 module.exports = {
-    Accelation:Accelation,
-    Position:Position,
-    Velocity:Velocity,
-    Vector:Vector,
+    CmpAccelation:CmpAccelation,
+    CmpPosition:CmpPosition,
+    CmpVelocity:CmpVelocity,
+    CmpVector:CmpVector,
     Rotation:Rotation,
     RotationSpeed:RotationSpeed,
     RotationAccelation:RotationAccelation,
     Size:Size,
-    TimeStamp:TimeStamp
+    CmpTimeStamp:CmpTimeStamp
 };
 

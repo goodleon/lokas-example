@@ -6,7 +6,7 @@ const BVTree = require('BVTree');
 const QuadTree = require('QuadTree');
 const Component = require('Component');
 const {MovingSystem} = require('MovingSystem');
-const {Position, Velocity, Accelation} = require("BaseComponents");
+const {CmpPosition, CmpVelocity, CmpAccelation} = require("BaseComponents");
 const Dice = require('Dice');
 
 let width = 800;
@@ -108,9 +108,9 @@ module.exports = {
         ecs.registerComponent(Collider);
         ecs.registerSingleton(Canvas);
         ecs.registerSingleton(PhysicWorld);
-        ecs.registerComponent(Position);
-        ecs.registerComponent(Velocity);
-        ecs.registerComponent(Accelation);
+        ecs.registerComponent(CmpPosition);
+        ecs.registerComponent(CmpVelocity);
+        ecs.registerComponent(CmpAccelation);
         ecs.registerSystem(MovingSystem);
         ecs.registerSystem({
             name: 'updating',
@@ -127,19 +127,19 @@ module.exports = {
         ecs.registerSystem({
             name: 'collision',
             enable: false,
-            components: [Collider, [Circle, Polygon], Velocity],
+            components: [Collider, [Circle, Polygon], CmpVelocity],
             update: function (ent, dt, now, ecs) {
                 let world = ecs.getSingleton(PhysicWorld);
                 let colliderA = ent.get('Collider');
                 let posA = ent.get('Polygon') || ent.get('Circle');
-                let velA = ent.get('Velocity') || ent.get('Velocity');
+                let velA = ent.get('CmpVelocity') || ent.get('CmpVelocity');
                 let result = new Contact();
                 let potentials = world.potentials(ent);
                 for (const colliderB of potentials) {
                     if (colliderA.collide(colliderB, result)) {
 
                         let posB = colliderB.getSibling('Polygon') || colliderB.getSibling('Circle');
-                        let velB = colliderB.getSibling('Velocity') || colliderB.getSibling('Velocity');
+                        let velB = colliderB.getSibling('CmpVelocity') || colliderB.getSibling('CmpVelocity');
                         posA.x -= result.overlap * result.overlap_x;
                         posA.y -= result.overlap * result.overlap_y;
 
@@ -216,7 +216,7 @@ module.exports = {
             let ent = ecs.createEntity();
             ent.add(Circle, x, y, radius, scale);
             ent.add(Collider);
-            let speed = ent.add(Velocity, 1, 1);
+            let speed = ent.add(CmpVelocity, 1, 1);
             speed.angle = Dice.rng(0, 360);
             speed.speed = Dice.rng(34, 60);
             ecs.getSingleton(PhysicWorld).insert(ent);
