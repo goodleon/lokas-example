@@ -1,5 +1,8 @@
 const Component = require('../Component');
 
+/**
+ * 多边形
+ */
 class CmpPolygon extends Component {
     static defineName() {
         return 'CmpPolygon';
@@ -30,8 +33,8 @@ class CmpPolygon extends Component {
         CmpPolygon.prototype.setPoints.call(this, points);
     }
 
-    setPoints(new_points) {
-        const count = new_points.length;
+    setPoints(newPoints) {
+        const count = newPoints.length;
 
         this._points = new Float64Array(count * 2);
         this._coords = new Float64Array(count * 2);
@@ -41,7 +44,7 @@ class CmpPolygon extends Component {
         const points = this._points;
 
         for (let i = 0, ix = 0, iy = 1; i < count; ++i, ix += 2, iy += 2) {
-            const new_point = new_points[i];
+            const new_point = newPoints[i];
 
             points[ix] = new_point[0];
             points[iy] = new_point[1];
@@ -50,7 +53,7 @@ class CmpPolygon extends Component {
         this._dirty_coords = true;
     }
 
-    _calculateCoords() {
+    _calculateCoords() { // 计算坐标么?
         const x = this.x;
         const y = this.y;
         const angle = this.angle;
@@ -116,7 +119,7 @@ class CmpPolygon extends Component {
         this._dirty_normals = true;
     }
 
-    draw(context) {
+    draw(context) { // 绘制?
         if (this.getEntity().isDirty()) {
             this._calculateCoords();
         }

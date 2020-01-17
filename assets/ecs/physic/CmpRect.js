@@ -1,5 +1,8 @@
 const Component = require('../Component');
 
+/**
+ * 矩形
+ */
 class CmpRect extends Component {
     static defineName() {
         return 'CmpRect';
@@ -52,7 +55,7 @@ class CmpRect extends Component {
         return !(this.minY > a.maxY || this.minX > a.maxX || this.maxY < a.minY || this.maxX < a.minX);
     };
 
-    draw(color, fill, graphic) {
+    draw(color, fill, graphic) { // 绘制矩形的??
         graphic.rect(this.minX, this.minY, this.w, this.h);
         graphic.strokeColor = cc.color(color);
         graphic.fillColor = cc.color(color);

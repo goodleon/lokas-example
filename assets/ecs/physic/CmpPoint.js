@@ -1,5 +1,8 @@
 const CmpPolygon = require('./CmpPolygon');
 
+/**
+ *
+ */
 class CmpPoint extends CmpPolygon {
     static defineName() {
         return 'CmpPoint';
