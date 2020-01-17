@@ -35,8 +35,8 @@ class ECS {
         this._eventListener = new EventEmitter();
         /**基础变量*/
         this._entityPool = {};              //实体<Entity>池 eg. this._entityPool[id] = ent;
-        this._componentPools = {};          //各种组件池<ComponentPool>容器
-        this._groups = {};                  //各种集合<Group>容器,组件<Component>数组为键值
+        this._componentPools = {};          //各种组件 池<ComponentPool>容器
+        this._groups = {};                  //各种集合 <Group>容器,组件<Component>数组为键值
         this._cachedGroups = {};            //单个组件<Component>为键值的集合<Group>缓存
         this._systems = [];                 //各个系统和监听集合
         this._systemIndexes = {};           //系统的名字索引
@@ -112,7 +112,10 @@ class ECS {
 }
 
 let pro = ECS.prototype;
-
+/**
+ * 当前ECS是客户端还是服务器
+ * @returns {string}
+ */
 pro.getRoleString = function () {
     if (this.isClient()) {
         return '客户端';
@@ -823,7 +826,7 @@ pro.loadModule = function (mod) {
         logger.error('载入失败,模组没有名字', mod);
         return;
     }
-    logger.log('wcx loadModule mod.name=' + mod.name);
+    logger.log('wcx loadModul e mod.name=' + mod.name);
     if (mod.onLoad) {
         let str = '#载入模组:' + mod.name + '------';
         if (mod.desc) {
@@ -919,8 +922,8 @@ pro.receiveCommand = function (cmd) {
  * 注册一个组件<Component>
  * @param name       组件别名,创建相同类型的组件可以指定不同别名
  * @param Component  组件
- * @param minSize    池里可用对象最小值
  * @param maxSize    使用中对象+池里可用对象的最大值
+ * @param minSize    池里可用对象最小值
  */
 pro.registerComponent = function (name, Component, maxSize, minSize) {
     let NewComponent;

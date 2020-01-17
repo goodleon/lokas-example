@@ -1,5 +1,8 @@
 const Component = require('../Component');
 
+/**
+ * 接触
+ */
 class CmpContact extends Component {
     static defineName() {
         return 'CmpContact';

@@ -31,6 +31,7 @@ let MovingSystem = [
 let MovingModule = {
     name: 'MovingModule',
     onLoad: function (ecs) {
+        // Module 注册component
         ecs.registerComponent('CmpPosition', CmpPosition, 300, 10);
         ecs.registerComponent('CmpVelocity', CmpVelocity, 300, 10);
         ecs.registerComponent('CmpAccelation', CmpAccelation, 300, 10);

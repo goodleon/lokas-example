@@ -12,9 +12,9 @@ const Dice = require('Dice');
 let width = 800;
 let height = 800;
 
-class PhysicWorld extends Component {
+class CmpPhysicWorld extends Component {
     static defineName() {
-        return 'PhysicWorld'
+        return 'CmpPhysicWorld'
     }
 
     constructor() {
@@ -107,7 +107,7 @@ module.exports = {
         ecs.registerComponent(CmpPolygon);
         ecs.registerComponent(CmpCollider);
         ecs.registerSingleton(Canvas);
-        ecs.registerSingleton(PhysicWorld);
+        ecs.registerSingleton(CmpPhysicWorld);
         ecs.registerComponent(CmpPosition);
         ecs.registerComponent(CmpVelocity);
         ecs.registerComponent(CmpAccelation);
@@ -118,7 +118,7 @@ module.exports = {
             update: function (ent, dt, now, ecs) {
                 let cCollider = ent.get('CmpCollider');
                 cCollider.updateBorder();
-                let world = ecs.getSingleton(PhysicWorld);
+                let world = ecs.getSingleton(CmpPhysicWorld);
                 world.remove(cCollider, true);
                 world.insert(cCollider, true);
             }
@@ -129,7 +129,7 @@ module.exports = {
             enable: false,
             components: [CmpCollider, [CmpCircle, CmpPolygon], CmpVelocity],
             update: function (ent, dt, now, ecs) {
-                let world = ecs.getSingleton(PhysicWorld);
+                let world = ecs.getSingleton(CmpPhysicWorld);
                 let colliderA = ent.get('CmpCollider');
                 let posA = ent.get('CmpPolygon') || ent.get('CmpCircle');
                 let velA = ent.get('CmpVelocity') || ent.get('CmpVelocity');
@@ -201,14 +201,14 @@ module.exports = {
             let ent = ecs.createEntity();
             ent.add(CmpPolygon, x, y, points, rotation, scaleX, scaleY);
             ent.add(CmpCollider);
-            ecs.getSingleton(PhysicWorld).insert(ent);
+            ecs.getSingleton(CmpPhysicWorld).insert(ent);
             return ent;
         });
         ecs.setSpawner('Polygon1', function (ecs, x, y, points, rotation, scaleX, scaleY) {
             let ent = ecs.createEntity();
             ent.add(CmpPolygon, x, y, points, rotation, scaleX, scaleY);
             ent.add(CmpCollider);
-            ecs.getSingleton(PhysicWorld).insert(ent);
+            ecs.getSingleton(CmpPhysicWorld).insert(ent);
             return ent;
         });
 
@@ -219,7 +219,7 @@ module.exports = {
             let speed = ent.add(CmpVelocity, 1, 1);
             speed.angle = Dice.rng(0, 360);
             speed.speed = Dice.rng(34, 60);
-            ecs.getSingleton(PhysicWorld).insert(ent);
+            ecs.getSingleton(CmpPhysicWorld).insert(ent);
             return ent;
         });
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[0, 0], [width, 0]]);
