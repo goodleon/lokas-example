@@ -1,9 +1,9 @@
-let System = function (ecs,opt) {
+let System = function (ecs, opt) {
     this.ecs = ecs;
     this.desc = opt.desc;
     this.name = opt.name;
-    this.updateTime = opt.updateTime||opt.interval;
-    this.priority = opt.priority||0;
+    this.updateTime = opt.updateTime || opt.interval;
+    this.priority = opt.priority || 0;
     this.components = opt.components;
     this.groups = ecs.registerGroups(opt.components);
     this.type = 'system';
@@ -23,7 +23,7 @@ let System = function (ecs,opt) {
     this.sysUpdate = opt.sysUpdate;
     this.onRegister = opt.onRegister;
     this.initUpdateHandlers(opt);
-    this.stateOnly = opt.stateOnly||'';
+    this.stateOnly = opt.stateOnly || '';
     this.onState = opt.onState;
     this.offState = opt.offState;
 };
@@ -35,13 +35,13 @@ let pro = System.prototype;
 pro.initUpdateHandlers = function (opt) {
     let self = this;
     if (!opt.updateHandler) {
-        this.updateHandler = function (dt,now,ecs) {
+        this.updateHandler = function (dt, now, ecs) {
             if (!self.update) {
                 return;
             }
-            for (let j=0;j<this.groups.length;j++) {
+            for (let j = 0; j < this.groups.length; j++) {
                 let group = this.groups[j];
-                for (let i=0;i<group._entityIndexes.length;i++) {
+                for (let i = 0; i < group._entityIndexes.length; i++) {
                     let id = group._entityIndexes[i];
                     let ent = group._entities[id];
                     //FIXME:这里临时处理
@@ -54,13 +54,13 @@ pro.initUpdateHandlers = function (opt) {
         }
     }
     if (!opt.lateUpdateHandler) {
-        this.lateUpdateHandler = function (dt,now,ecs) {
+        this.lateUpdateHandler = function (dt, now, ecs) {
             if (!self.lateUpdate) {
                 return;
             }
-            for (let j=0;j<this.groups.length;j++) {
+            for (let j = 0; j < this.groups.length; j++) {
                 let group = this.groups[j];
-                for (let i=0;i<group._entityIndexes.length;i++) {
+                for (let i = 0; i < group._entityIndexes.length; i++) {
                     let id = group._entityIndexes[i];
                     let ent = group._entities[id];
                     //FIXME:这里临时处理
@@ -80,9 +80,9 @@ pro.setAddOrder = function (order) {
 };
 
 pro.getSize = function () {
-    let num=0;
-    for (let i=0;i<this.groups.length;i++) {
-        num+=this.groups[i]._entityIndexes.length;
+    let num = 0;
+    for (let i = 0; i < this.groups.length; i++) {
+        num += this.groups[i]._entityIndexes.length;
     }
     return num;
 };
@@ -91,71 +91,71 @@ pro.isEmpty = function () {
     return this.getSize() === 0;
 };
 
-pro.calUpdate = function (sysUpdateTime,now,ecs) {
+pro.calUpdate = function (sysUpdateTime, now, ecs) {
     if (!this.enabled) {
         return [];
     }
     let ret = [];
-    let updateTime = this.updateTime||sysUpdateTime;
-    while (updateTime<now-this.lastUpdateTime) {
+    let updateTime = this.updateTime || sysUpdateTime;
+    while (updateTime < now - this.lastUpdateTime) {
         ret.push({
-            activeTime:this.lastUpdateTime+updateTime,
-            interval:updateTime
+            activeTime: this.lastUpdateTime + updateTime,
+            interval: updateTime
         });
-        this.lastUpdateTime+=updateTime;
+        this.lastUpdateTime += updateTime;
     }
     return ret;
 };
 
-pro.doOnState = function (now,ecs) {
+pro.doOnState = function (now, ecs) {
     if (this.enabled) {
         let self = this;
-        this.ecs.once('_afterUpdate',function () {
+        this.ecs.once('_afterUpdate', function () {
             self.onState && self.onState(now, ecs);
         });
     }
 };
 
-pro.doOffState = function (now,ecs) {
+pro.doOffState = function (now, ecs) {
     if (this.enabled) {
         let self = this;
-        this.ecs.once('_afterUpdate',function () {
+        this.ecs.once('_afterUpdate', function () {
             self.offState && self.offState(now, ecs);
         });
     }
 };
 
-pro.doUpdates = function (dt,now,ecs) {
+pro.doUpdates = function (dt, now, ecs) {
     if (this.stateOnly) {
-        if (this.stateOnly!==ecs.getState()) {
+        if (this.stateOnly !== ecs.getState()) {
             return;
         }
     }
     ecs.updateCommands();
-    this.beforeUpdate&&this.beforeUpdate(dt, now, this.ecs);
+    this.beforeUpdate && this.beforeUpdate(dt, now, this.ecs);
     this.sysUpdate && this.sysUpdate(dt, now, this.ecs);
-    if (this.groups.length===0) {
+    if (this.groups.length === 0) {
         this.update && this.update(dt, now, this.ecs);
         return;
     }
     this.updateHandler(dt, now, this.ecs);
-    this.afterUpdate&&this.afterUpdate(dt, now, this.ecs);
+    this.afterUpdate && this.afterUpdate(dt, now, this.ecs);
 };
 
-pro.doLateUpdates = function (dt,now,ecs) {
+pro.doLateUpdates = function (dt, now, ecs) {
     if (this.stateOnly) {
-        if (this.stateOnly!==ecs.getState()) {
-            return ;
+        if (this.stateOnly !== ecs.getState()) {
+            return;
         }
     }
-    this.beforeLateUpdate&&this.beforeLateUpdate(dt, now, this.ecs);
+    this.beforeLateUpdate && this.beforeLateUpdate(dt, now, this.ecs);
     this.sysLateUpdate && this.sysLateUpdate(dt, now, this.ecs);
-    if (!this.groups.length===0) {
+    if (!this.groups.length === 0) {
         this.lateUpdate && this.lateUpdate(dt, now, this.ecs);
         return;
     }
     this.lateUpdateHandler(dt, now, this.ecs);
-    this.afterLateUpdate&&this.afterLateUpdate(dt, now, this.ecs);
+    this.afterLateUpdate && this.afterLateUpdate(dt, now, this.ecs);
 };
 
 

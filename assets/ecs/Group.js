@@ -5,8 +5,8 @@ const ECSUtil = require('./ECSUtil');
  * @constructor
  */
 let Group = function (compGroup) {
-    this._componentTypes=[];
-    for (let i=0;i<compGroup.length;i++) {
+    this._componentTypes = [];
+    for (let i = 0; i < compGroup.length; i++) {
         let comp = compGroup[i];
         if (!comp) {
             throw new Error('组件不存在,可能未注册');
@@ -21,10 +21,10 @@ let Group = function (compGroup) {
  * 尝试往集合<Group>中添加一个实体<Entity>(只有包含集合<Group>中所有组件<Component>类型的实体<Entity>会被添加到Group中)
  * @param ent
  */
-Group.prototype.addEntity=function (ent) {
+Group.prototype.addEntity = function (ent) {
     if (ent.includes(this._componentTypes)) {
         if (!this.hasEntity(ent)) {
-            this._entities[ent.id]=ent;
+            this._entities[ent.id] = ent;
             this._entityIndexes.push(ent.id);
         }
     }
@@ -34,7 +34,7 @@ Group.prototype.addEntity=function (ent) {
  * @param ent
  * @returns {*}
  */
-Group.prototype.hasEntity=function (ent) {
+Group.prototype.hasEntity = function (ent) {
     let id = ent.id;
     return this._entities[id];
 };
@@ -43,13 +43,13 @@ Group.prototype.hasEntity=function (ent) {
  * @param ent
  * @returns {*}
  */
-Group.prototype.hasEntityByID=function (id) {
+Group.prototype.hasEntityByID = function (id) {
     return this._entities[id];
 };
 
 Group.prototype.getEntities = function () {
     let ret = [];
-    for (let i=0;i<this._entityIndexes.length;i++) {
+    for (let i = 0; i < this._entityIndexes.length; i++) {
         let id = this._entityIndexes[i];
         let ent = this._entities[id];
         if (!ent) {
@@ -65,7 +65,7 @@ Group.prototype.getEntities = function () {
 Group.prototype.getSingletonEntity = function () {
 
     let id = this._entityIndexes[0];
-    if (id ===undefined) {
+    if (id === undefined) {
         return;
     }
     return this._entities[id];
@@ -74,18 +74,18 @@ Group.prototype.getSingletonEntity = function () {
  * 移除一个实体<Entity>ID队列,通常在每一帧更新的最后做
  * @param arr
  */
-Group.prototype.removeEntityArray=function (arr) {
+Group.prototype.removeEntityArray = function (arr) {
     let removeArr = [];
-    for (let i=0;i<arr.length;i++) {
-        if (arr[i].includes(this._componentTypes)){
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].includes(this._componentTypes)) {
             removeArr.push(arr[i].id);
         }
     }
-    for (let i=0;i<removeArr.length;i++) {
+    for (let i = 0; i < removeArr.length; i++) {
         delete this._entities[removeArr[i]];
         let id = removeArr[i];
-        ECSUtil.remove(this._entityIndexes,function (n) {
-            return n===id;
+        ECSUtil.remove(this._entityIndexes, function (n) {
+            return n === id;
         });
     }
 };
@@ -93,15 +93,15 @@ Group.prototype.removeEntityArray=function (arr) {
  * 尝试立即移除一个实体<Entity>
  * @param ent
  */
-Group.prototype.removeEntity=function (ent) {
+Group.prototype.removeEntity = function (ent) {
     //如果实体中不包含集合的组件,提前跳出
-    if (!ent.includes(this._componentTypes)){
+    if (!ent.includes(this._componentTypes)) {
         return;
     }
     delete this._entities[ent.id];
     if (this._entityIndexes) {
-        ECSUtil.remove(this._entityIndexes,function (n) {
-            return n===ent.id;
+        ECSUtil.remove(this._entityIndexes, function (n) {
+            return n === ent.id;
         });
     }
 };
@@ -109,17 +109,17 @@ Group.prototype.removeEntity=function (ent) {
  * 检查集合<Group>是否包含该类型的组件<Component>,接受多个参数
  * @param comp string|[string]|string,string,string
  */
-Group.prototype.match=function (comp) {
+Group.prototype.match = function (comp) {
     let args = [].slice.call(arguments);
     let compStrArr = [];
-    if (args.length===0) {
+    if (args.length === 0) {
         return false;
-    } else if (args.length===1) {
-        compStrArr = ECSUtil.isArray(comp)?comp.slice():[comp];
+    } else if (args.length === 1) {
+        compStrArr = ECSUtil.isArray(comp) ? comp.slice() : [comp];
     } else {
         compStrArr = args;
     }
-    if (!ECSUtil.includes(this._componentTypes,compStrArr)) {
+    if (!ECSUtil.includes(this._componentTypes, compStrArr)) {
         return false;
     }
     return true;
@@ -129,4 +129,4 @@ Group.prototype.length = function () {
     return this._entityIndexes.length;
 };
 
-module.exports=Group;
+module.exports = Group;

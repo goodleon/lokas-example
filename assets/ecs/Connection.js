@@ -1,4 +1,4 @@
-let Connection = function (uid,ecs) {
+let Connection = function (uid, ecs) {
     this.uid = uid;
     this.step = -1;
     this.entitySteps = {};
@@ -15,7 +15,7 @@ pro.reset = function () {
     this.entitySteps = [];
 };
 
-pro.sync = function (step,entMap) {
+pro.sync = function (step, entMap) {
     this.step = step;
     this.entitySteps = entMap;
 };

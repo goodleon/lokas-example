@@ -1,38 +1,46 @@
 class Component {
-    static defineName(){
+    static defineName() {
         return 'Component';
     }
-    constructor(){
+
+    constructor() {
         this._entity = null;
     }
-    defineData(){
+
+    defineData() {
         return {};
     }
+
     getComponentName() {
         return this.constructor.defineName();
     }
-    getSibling(comp){
+
+    getSibling(comp) {
         if (this._entity) {
             return this._entity.get(comp);
         }
     }
-    setEntity(ent){
+
+    setEntity(ent) {
         this._entity = ent;
     }
-    getEntity(){
+
+    getEntity() {
         return this._entity;
     }
-    getECS(){
+
+    getECS() {
         if (this._entity) {
             return this._entity.getECS();
         }
     }
-    dirty(){
+
+    dirty() {
         this.onDirty(this._entity, this._entity._ecs);
         let renderer = this.getRenderer();
         if (renderer) {
             let renderComp = this.getSibling(renderer);
-            renderComp&&renderComp.dirty();
+            renderComp && renderComp.dirty();
         }
         this.getECS().addRenderQueue(this);
         if (this._entity) {
@@ -40,21 +48,23 @@ class Component {
         }
     }
 
-    getRenderer(){
+    getRenderer() {
         return this.getECS().getComponentRenderer(this);
     }
-    isRenderer(){
-        return this.getECS().rendererArray.indexOf(this.getComponentName())!==-1;
+
+    isRenderer() {
+        return this.getECS().rendererArray.indexOf(this.getComponentName()) !== -1;
     };
-    onAdd(ent,ecs){
+
+    onAdd(ent, ecs) {
 
     }
 
-    onRemove(ent,ecs) {
+    onRemove(ent, ecs) {
 
     }
 
-    onDirty(ent,ecs) {
+    onDirty(ent, ecs) {
 
     }
 

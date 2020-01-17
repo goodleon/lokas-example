@@ -6,31 +6,32 @@ let _longBound = {
     max: Long.fromString("9223372036854775807")
 };
 
-class TAGLong extends BinaryBase{
-    constructor(){
+class TAGLong extends BinaryBase {
+    constructor() {
         super();
         this.type = "TAG_Long";
     }
+
     _readBodyFromBuffer(buff, offset) {
         let sliced = buff.slice(offset, offset + 8);
         this.value = Long.fromBytesBE(sliced, true);
         return 8;
     }
 
-    calcBufferLength(){
+    calcBufferLength() {
         return 8;
     }
 
     writeBuffer(buff, offset) {
         let bytes = this.value.toBytesBE();
-        for(let i = 0, j = offset; i < 8; i++, j++) {
+        for (let i = 0, j = offset; i < 8; i++, j++) {
             buff.writeUInt8(bytes[i], j);
         }
         return 8;
     }
 
     toJSON() {
-        if(!this.value.greaterThan(9007199254740992)) {
+        if (!this.value.greaterThan(9007199254740992)) {
             return this.value.toNumber();
         } else {
             return this.value.toString();
@@ -39,21 +40,21 @@ class TAGLong extends BinaryBase{
 
     setValue(value) {
         let temp = null;
-        if(value instanceof Long) {
+        if (value instanceof Long) {
             temp = value;
-        } else if(typeof value === "string") {
+        } else if (typeof value === "string") {
             temp = Long.fromString(value);
-        } else if(value instanceof Long) {
+        } else if (value instanceof Long) {
             temp = Long.fromString(value.toString());
-        } else if(typeof value === "number" && !isNaN(value)) {
+        } else if (typeof value === "number" && !isNaN(value)) {
             temp = Long.fromNumber(value);
         }
-        if(null === temp) {
+        if (null === temp) {
             console.log(value);
             throw new Error("Wrong type to set TAG_Long's value.");
         }
 
-        if(temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
+        if (temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
             throw new Error("Value of TAG_Long should between " +
                 "-9223372036854775808 and 9223372036854775807");
         }
@@ -61,7 +62,6 @@ class TAGLong extends BinaryBase{
         this.value = temp;
     }
 }
-
 
 
 module.exports = TAGLong;

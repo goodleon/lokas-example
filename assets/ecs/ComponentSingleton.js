@@ -4,7 +4,7 @@
  * @param ecs
  * @constructor
  */
-let ComponentSingleton = function (ComponentType,ecs) {
+let ComponentSingleton = function (ComponentType, ecs) {
     this._component = ComponentType;            //给对象赋值
     this._instance = null;
     this._name = ComponentType.prototype.__classname;  //名称为对象定义的原型名
@@ -16,9 +16,9 @@ let ComponentSingleton = function (ComponentType,ecs) {
  */
 ComponentSingleton.prototype.create = function () {
     let args = [].slice.call(arguments);
-    if (args.length>0) {
+    if (args.length > 0) {
         this._instance = {};
-        this._component.prototype.constructor.apply(this._instance,args);
+        this._component.prototype.constructor.apply(this._instance, args);
         this._instance.__proto__ = this._component.prototype;
     } else {
         this._instance = new this._component();
@@ -35,7 +35,7 @@ ComponentSingleton.prototype.create = function () {
  */
 ComponentSingleton.prototype.recycle = function (comp) {
     if (this._instance) {
-        this._instance.onDestroy&&this._instance.onDestroy(this._ecs);
+        this._instance.onDestroy && this._instance.onDestroy(this._ecs);
     }
     this._instance = null;
 };
@@ -46,12 +46,12 @@ ComponentSingleton.prototype.recycle = function (comp) {
 ComponentSingleton.prototype.get = function () {
     let args = [].slice.call(arguments);
     if (this._instance) {
-        if (args.length>0) {
+        if (args.length > 0) {
             this._component.prototype.constructor.apply(this._instance, args);
         }
         return this._instance;
     } else {
-        return this.create.apply(this,args);
+        return this.create.apply(this, args);
     }
 };
 

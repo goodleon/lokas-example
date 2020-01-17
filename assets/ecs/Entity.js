@@ -1,6 +1,6 @@
 "use strict";
 
-const logger = require('../logger/Logger')||console;
+const logger = require('../logger/Logger') || console;
 const ECSUtil = require('./ECSUtil');
 const nbt = require('./binary/nbt');
 const EventEmitter = require('./event-emmiter');
@@ -51,28 +51,28 @@ Entity.prototype.debug = function () {
         let compObj = {};
         let comName = ECSUtil.getComponentType(comp);
         //TODO:这里要更新
-        let nbtFormat = comp.defineData?comp.defineData():comp.nbtFormat;
+        let nbtFormat = comp.defineData ? comp.defineData() : comp.nbtFormat;
         if (!nbtFormat) {
             return;
         }
         for (let j in nbtFormat) {
             let type = nbtFormat[j];
-            if (type!=='Entity'||type!=='EntityMap'||type!=='EntityArray') {
+            if (type !== 'Entity' || type !== 'EntityMap' || type !== 'EntityArray') {
                 compObj[j] = comp[j];
             }
-            if (type!=='Entity'&&comp[j]) {
-                compObj[j] =comp[j].id;
+            if (type !== 'Entity' && comp[j]) {
+                compObj[j] = comp[j].id;
             }
-            if (type!=='EntityMap'&&comp[j]) {
-                compObj[j] ={};
+            if (type !== 'EntityMap' && comp[j]) {
+                compObj[j] = {};
                 for (let k in comp[j]) {
-                    compObj[j][k] = comp[j][k]?comp[j][k].id:'null';
+                    compObj[j][k] = comp[j][k] ? comp[j][k].id : 'null';
                 }
             }
-            if (type!=='Entity'&&comp[j]) {
-                compObj[j] =[];
+            if (type !== 'Entity' && comp[j]) {
+                compObj[j] = [];
                 for (let k in comp[j]) {
-                    compObj[j].push(comp[j][k]?comp[j][k].id:'null');
+                    compObj[j].push(comp[j][k] ? comp[j][k].id : 'null');
                 }
             }
         }
@@ -82,7 +82,7 @@ Entity.prototype.debug = function () {
 };
 
 Entity.prototype.addTag = function (tag) {
-    if (this._tags.indexOf(tag)===-1) {
+    if (this._tags.indexOf(tag) === -1) {
         this._tags.push(tag);
         return true;
     }
@@ -90,13 +90,13 @@ Entity.prototype.addTag = function (tag) {
 };
 
 Entity.prototype.hasTag = function (tag) {
-    return this._tags.indexOf(tag)!==-1;
+    return this._tags.indexOf(tag) !== -1;
 };
 
 Entity.prototype.removeTag = function (tag) {
     let index = this._tags.indexOf(tag);
-    if (index!==-1) {
-        this._tags.splice(index,1);
+    if (index !== -1) {
+        this._tags.splice(index, 1);
         return true;
     }
     return false;
@@ -118,7 +118,7 @@ Entity.prototype.dirty = function () {
     if (this._dirty) {
         return;
     }
-    if (this._ecs._dirtyEntities.indexOf(this)===-1&&this._ecs._newEntities.indexOf(this)===-1) {
+    if (this._ecs._dirtyEntities.indexOf(this) === -1 && this._ecs._newEntities.indexOf(this) === -1) {
         this._ecs._dirtyEntities.push(this);
     }
     this._ecs._dirty = true;
@@ -141,7 +141,7 @@ Entity.prototype.markDirty = function (comp) {
         return;
     }
     let name = ECSUtil.getComponentType(comp);
-    if (this._modifyMarks.indexOf(name)===-1&&this._addMarks.indexOf(name)===-1) {
+    if (this._modifyMarks.indexOf(name) === -1 && this._addMarks.indexOf(name) === -1) {
         this._modifyMarks.push(name);
     }
 };
@@ -152,10 +152,10 @@ Entity.prototype.addMark = function (comp) {
         return;
     }
     let name = ECSUtil.getComponentType(comp);
-    if (this._addMarks.indexOf(name)===-1) {
+    if (this._addMarks.indexOf(name) === -1) {
         let modIndex = this._modifyMarks.indexOf(name);
-        if (modIndex!==-1) {
-            this._modifyMarks.splice(modIndex,1);
+        if (modIndex !== -1) {
+            this._modifyMarks.splice(modIndex, 1);
         }
         this._addMarks.push(name);
     }
@@ -167,7 +167,7 @@ Entity.prototype.removeMark = function (comp) {
         return;
     }
     let name = ECSUtil.getComponentType(comp);
-    if (this._removeMarks.indexOf(name)===-1) {
+    if (this._removeMarks.indexOf(name) === -1) {
         this._removeMarks.push(name);
     }
 };
@@ -180,15 +180,15 @@ Entity.prototype.snapCurrent = function () {
     let modComps = nbt.List();
     let addComps = nbt.List();
     let remComps = nbt.List();
-    for (let i=0;i<this._modifyMarks.length;i++) {
+    for (let i = 0; i < this._modifyMarks.length; i++) {
         let comp = this._components[this._modifyMarks[i]];
         modComps.push(this.comp2NBT(comp));
     }
-    for (let i=0;i<this._addMarks.length;i++) {
+    for (let i = 0; i < this._addMarks.length; i++) {
         let comp = this._components[this._addMarks[i]];
         addComps.push(this.comp2NBT(comp));
     }
-    for (let i=0;i<this._removeMarks.length;i++) {
+    for (let i = 0; i < this._removeMarks.length; i++) {
         // let id = this._ecs.getComponentID(this._addMarks[i]);
         let id = this._modifyMarks[i];
         remComps.push(nbt.String(id));
@@ -210,27 +210,27 @@ Entity.prototype.snapPrevious = function () {
     let addComps = nbt.List();
     let remComps = nbt.List();
     let compList = this._lastSnapshot.at(2);
-    for (let i=0;i<this._modifyMarks.length;i++) {
+    for (let i = 0; i < this._modifyMarks.length; i++) {
         // let id = this._ecs.getComponentID(this._modifyMarks[i]);
         let id = this._modifyMarks[i];
-        for (let j=0;j<compList.getSize();j++) {
+        for (let j = 0; j < compList.getSize(); j++) {
             if (id === compList.at(j).at(0).value) {
                 modComps.push(compList.at(j));
                 break;
             }
         }
     }
-    for (let i=0;i<this._addMarks.length;i++) {
+    for (let i = 0; i < this._addMarks.length; i++) {
         let id = this._removeMarks[i];
         // let id = this._ecs.getComponentID(this._removeMarks[i]);
-        for (let j=0;j<compList.getSize();j++) {
+        for (let j = 0; j < compList.getSize(); j++) {
             if (id === compList.at(j).at(0).value) {
                 addComps.push(compList.at(j));
                 break;
             }
         }
     }
-    for (let i=0;i<this._removeMarks.length;i++) {
+    for (let i = 0; i < this._removeMarks.length; i++) {
         let id = this._addMarks[i];
         // let id = this._ecs.getComponentID(this._addMarks[i]);
         remComps.push(nbt.String(id));
@@ -242,12 +242,12 @@ Entity.prototype.snapPrevious = function () {
 };
 
 
-Entity.prototype.comp2NBT = function (comp,connData) {
+Entity.prototype.comp2NBT = function (comp, connData) {
     if (comp.nosync) {
         return;
     }
-    if (comp.onSync&&connData) {
-        comp = comp.onSync(this,this._ecs,connData);
+    if (comp.onSync && connData) {
+        comp = comp.onSync(this, this._ecs, connData);
     }
     let compComplex = nbt.Complex();
     // compComplex.addValue(nbt.Int(this._ecs.getComponentID(comp)));
@@ -262,9 +262,9 @@ Entity.prototype.comp2NBT = function (comp,connData) {
         return compComplex;
     }
 
-    let nbtFormat = comp.defineData?comp.defineData():comp.nbtFormat;
+    let nbtFormat = comp.defineData ? comp.defineData() : comp.nbtFormat;
     if (!nbtFormat) {
-        throw new Error(comp.getComponentName?comp.getComponentName():comp.__proto__.__classname+' dont have nbtFormat');
+        throw new Error(comp.getComponentName ? comp.getComponentName() : comp.__proto__.__classname + ' dont have nbtFormat');
     }
     if (Object.keys(nbtFormat).length === 0) {
         compComplex.addValue(nbt.Complex());
@@ -295,10 +295,10 @@ Entity.prototype.comp2NBT = function (comp,connData) {
                 nbtObj.addValue(j, nbt.Long(id));
             }
             dataComplex.addValue(nbtObj);
-        } else if (type==='Entity') {
-            let eid = comp[i]?comp[i].id:0;
+        } else if (type === 'Entity') {
+            let eid = comp[i] ? comp[i].id : 0;
             dataComplex.addValue(nbt.Long(eid))
-        } else if (type==='JSObject'||type==='Object') {
+        } else if (type === 'JSObject' || type === 'Object') {
             dataComplex.addValue(nbt.createFromJSObject(comp[i]))
         } else {
             dataComplex.addValue(nbt[type](comp[i]));
@@ -306,12 +306,12 @@ Entity.prototype.comp2NBT = function (comp,connData) {
     }
     compComplex.addValue(dataComplex);
     if (comp.onSyncFinish) {
-        comp.onSyncFinish(this,this._ecs,connData);
+        comp.onSyncFinish(this, this._ecs, connData);
     }
     return compComplex;
 };
 
-Entity.prototype.compFormatFromNBT = function (step,comp, nbt) {
+Entity.prototype.compFormatFromNBT = function (step, comp, nbt) {
     let self = this;
     if (nbt.length === 0) {
         return;
@@ -321,7 +321,7 @@ Entity.prototype.compFormatFromNBT = function (step,comp, nbt) {
         comp.dirty();
         return;
     }
-    let nbtFormat = comp.defineData?comp.defineData():comp.nbtFormat;
+    let nbtFormat = comp.defineData ? comp.defineData() : comp.nbtFormat;
     if (!nbtFormat) {
         throw new Error('comp dont have nbtFormat');
     }
@@ -340,14 +340,14 @@ Entity.prototype.compFormatFromNBT = function (step,comp, nbt) {
                 if (ent) {
                     comp[i].push(ent);
                 } else {
-                    comp[i].push(new Entity(null,id));
+                    comp[i].push(new Entity(null, id));
                     self.__unserializeEntityCount++;
-                    this._ecs.once('__unserializeEntity'+step+id,function (idx,ent) {
+                    this._ecs.once('__unserializeEntity' + step + id, function (idx, ent) {
                         self.__unserializeEntityCount--;
                         if (idx === id) {
                             comp[i][j] = ent;
                         }
-                        if (self.__unserializeEntityCount===0) {
+                        if (self.__unserializeEntityCount === 0) {
                             comp.dirty();
                         }
                     });
@@ -365,12 +365,12 @@ Entity.prototype.compFormatFromNBT = function (step,comp, nbt) {
                     comp[i][names[j]] = ent;
                 } else {
                     self.__unserializeEntityCount++;
-                    this._ecs.once('__unserializeEntity'+step+id,function (idx,ent) {
+                    this._ecs.once('__unserializeEntity' + step + id, function (idx, ent) {
                         self.__unserializeEntityCount--;
                         if (idx === id) {
                             comp[i][names[j]] = ent;
                         }
-                        if (self.__unserializeEntityCount===0) {
+                        if (self.__unserializeEntityCount === 0) {
                             comp.dirty();
                         }
                     });
@@ -387,19 +387,19 @@ Entity.prototype.compFormatFromNBT = function (step,comp, nbt) {
                 } else {
 
                     self.__unserializeEntityCount++;
-                    this._ecs.once('__unserializeEntity'+step+eid,function (idx,ent) {
+                    this._ecs.once('__unserializeEntity' + step + eid, function (idx, ent) {
                         self.__unserializeEntityCount--;
                         if (idx === eid) {
                             comp[i] = ent;
                         }
-                        if (self.__unserializeEntityCount===0) {
+                        if (self.__unserializeEntityCount === 0) {
                             comp.dirty();
                         }
                     });
                 }
             }
 
-        } else if (type === 'JSObject'||'Object') {
+        } else if (type === 'JSObject' || 'Object') {
             comp[i] = nbt.at(count).toJSObject();
         } else {
             comp[i] = nbt.at(count).value;
@@ -411,7 +411,7 @@ Entity.prototype.compFormatFromNBT = function (step,comp, nbt) {
 
 Entity.prototype.nbt2Command = function (nbt) {
     let count = 0;
-    let nbtFormat = nbt.defineData?nbt.defineData():nbt.nbtFormat;
+    let nbtFormat = nbt.defineData ? nbt.defineData() : nbt.nbtFormat;
     for (let i in nbtFormat) {
         if (!nbtFormat.hasOwnProperty(i)) {
             continue;
@@ -424,50 +424,50 @@ Entity.prototype.command2Nbt = function (command) {
 
 };
 
-Entity.prototype.fromNBT = function (step,nbt) {
-    if (nbt.getSize()===3) {
+Entity.prototype.fromNBT = function (step, nbt) {
+    if (nbt.getSize() === 3) {
         this._step = nbt.at(1).value.toNumber();
         let comps = nbt.at(2);
         let syncCompArr = [];
-        for (let i=0;i<comps.getSize();i++) {
+        for (let i = 0; i < comps.getSize(); i++) {
             let compNbt = comps.at(i);
             let compName = this._ecs.getComponentNameFromDefine(compNbt.at(0).value);
             syncCompArr.push(compName);
-            let comp = this.get(compName)||this.add(compName);
-            this.compFormatFromNBT(step,comp,compNbt.at(1));
+            let comp = this.get(compName) || this.add(compName);
+            this.compFormatFromNBT(step, comp, compNbt.at(1));
             comp.dirty();
         }
         for (let i in this._components) {
-            if (syncCompArr.indexOf(i)===-1) {
+            if (syncCompArr.indexOf(i) === -1) {
                 let comp = this._components[i];
-                if (this._ecs.getComponentDefine(comp)!==undefined) {
+                if (this._ecs.getComponentDefine(comp) !== undefined) {
                     this.remove(comp);
                 }
             }
         }
     }
-    if (nbt.getSize()===5) {
+    if (nbt.getSize() === 5) {
         this._step = nbt.at(1).value.toNumber();
         let modComps = nbt.at(2);
-        for (let i=0;i<modComps.getSize();i++) {
+        for (let i = 0; i < modComps.getSize(); i++) {
             let compNbt = modComps.at(i);
             let compName = this._ecs.getComponentNameFromDefine(compNbt.at(0).value);
-            let comp = this.get(compName)||this.add(compName);
+            let comp = this.get(compName) || this.add(compName);
             let compParams = compNbt.at(1);
-            this.compFormatFromNBT(step,comp,compParams);
+            this.compFormatFromNBT(step, comp, compParams);
             comp.dirty();
         }
         let addComps = nbt.at(3);
-        for (let i=0;i<addComps.getSize();i++) {
+        for (let i = 0; i < addComps.getSize(); i++) {
             let compNbt = addComps.at(i);
             let compName = this._ecs.getComponentNameFromDefine(compNbt.at(0).value);
             let comp = this.add(compName);
             let compParams = compNbt.at(1);
-            this.compFormatFromNBT(step,comp,compParams);
+            this.compFormatFromNBT(step, comp, compParams);
             comp.dirty();
         }
         let removeComps = nbt.at(4);
-        for (let i=0;i<removeComps.getSize();i++) {
+        for (let i = 0; i < removeComps.getSize(); i++) {
             let compName = this._ecs.getComponentNameFromDefine(removeComps.at(i).value);
             this.remove(compName);
         }
@@ -487,7 +487,7 @@ Entity.prototype.snapshot = function (connData) {
         if (comp.nosync) {
             continue;
         }
-        components.push(this.comp2NBT(comp,connData));
+        components.push(this.comp2NBT(comp, connData));
     }
     ret.addValue(components);
     this._lastSnapshot = this._snapshot;
@@ -559,8 +559,8 @@ Entity.prototype.add = function (comp) {
         }
 
     }
-    if (comp._entity&&comp._entity!==this) {
-        logger.error('组件已经绑定有实体',comp,comp._entity);
+    if (comp._entity && comp._entity !== this) {
+        logger.error('组件已经绑定有实体', comp, comp._entity);
         // throw new Error();
     }
     comp._entity = this;
@@ -574,7 +574,7 @@ Entity.prototype.add = function (comp) {
             }
         } else {
             if (comp['onAdd']) {
-                if (ECSUtil.getComponentType(comp)=='ControlButton') {
+                if (ECSUtil.getComponentType(comp) == 'ControlButton') {
                     logger.debug('添加ControlButton组件');
                 }
                 comp.onAdd(this, this._ecs);
@@ -589,33 +589,33 @@ Entity.prototype.add = function (comp) {
     if (renderer) {
         this.add(renderer);
     }
-    this.getECS().emit('add component',comp,this,this._ecs);
-    this.emit('add component',comp,this,this._ecs);
+    this.getECS().emit('add component', comp, this, this._ecs);
+    this.emit('add component', comp, this, this._ecs);
     return comp;
 };
 
 
-Entity.prototype.once=function (evt, cb) {
+Entity.prototype.once = function (evt, cb) {
     return this._eventListener.once(evt, cb)
 };
 
-Entity.prototype.on=function (evt, cb) {
+Entity.prototype.on = function (evt, cb) {
     return this._eventListener.on(evt, cb)
 };
 
-Entity.prototype.off=function (evt, cb) {
+Entity.prototype.off = function (evt, cb) {
     if (cb) {
-        return this._eventListener.off(evt,cb);
+        return this._eventListener.off(evt, cb);
     }
     return this._eventListener.removeAllListeners(evt);
 };
 
-Entity.prototype.emit=function (evt) {
+Entity.prototype.emit = function (evt) {
     return this._eventListener.emit.apply(this._eventListener, arguments);
 };
 
 Entity.prototype.isComponentDirty = function (compName) {
-    return this._modifyMarks.indexOf(compName)!==-1||this._addMarks.indexOf(compName)!==-1||this._removeMarks.indexOf(compName)!==-1;
+    return this._modifyMarks.indexOf(compName) !== -1 || this._addMarks.indexOf(compName) !== -1 || this._removeMarks.indexOf(compName) !== -1;
 };
 /**
  * 移除实体的一个组件
@@ -633,11 +633,11 @@ Entity.prototype.remove = function (comp) {
             this.remove(renderer);
         }
 
-        if (ECSUtil.getComponentType(comp)=='ControlButton') {
+        if (ECSUtil.getComponentType(comp) == 'ControlButton') {
             logger.debug('移除ControlButton组件');
         }
-        this.getECS().emit('remove component',comp,this,this._ecs);
-        this.emit('remove component',comp,this,this._ecs);
+        this.getECS().emit('remove component', comp, this, this._ecs);
+        this.emit('remove component', comp, this, this._ecs);
         if (comp['onRemove']) {
             comp.onRemove(this, this._ecs);
         }
@@ -681,7 +681,7 @@ Entity.prototype.getComponentTypes = function () {
     let ret = [];
     for (let i in this._components) {
         let comp = this._components[i];
-        ret.push(comp.getComponentName?comp.getComponentName():comp.__proto__.__classname);
+        ret.push(comp.getComponentName ? comp.getComponentName() : comp.__proto__.__classname);
     }
     //ret.sort();
     return ret;

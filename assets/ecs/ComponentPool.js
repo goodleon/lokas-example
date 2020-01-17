@@ -5,11 +5,11 @@
  * @param minSize
  * @constructor
  */
-let ComponentPool = function (ComponentType,maxSize,minSize,ecs) {
+let ComponentPool = function (ComponentType, maxSize, minSize, ecs) {
     this._component = ComponentType;            //给对象赋值
     this._name = ComponentType.prototype.__classname;  //名称为对象定义的原型名
     this._pool = [];
-    this._itemCount=0;
+    this._itemCount = 0;
     this._maxSize = maxSize;
     this._minSize = minSize;
     this._ecs = ecs;
@@ -21,9 +21,9 @@ let ComponentPool = function (ComponentType,maxSize,minSize,ecs) {
 ComponentPool.prototype.create = function () {
     let args = [].slice.call(arguments);
     let ret;
-    if (args.length>0) {
+    if (args.length > 0) {
         ret = Object.create(this._component.prototype);
-        this._component.prototype.constructor.apply(ret,args);
+        this._component.prototype.constructor.apply(ret, args);
     } else {
         ret = new this._component();
     }
@@ -36,13 +36,13 @@ ComponentPool.prototype.create = function () {
 /**
  * 删除对象池中最后一个组件<Component>并调用它的onDestroy方法
  */
-ComponentPool.prototype.popAndDestroy=function() {
+ComponentPool.prototype.popAndDestroy = function () {
     let comp = this._pool.pop();
     if (comp['onDestroy']) {
         comp.onDestroy(this._ecs);
     }
     this._itemCount--;
-    comp=null;
+    comp = null;
 };
 /**
  * 回收一个组件<Component>到对象池
@@ -58,16 +58,16 @@ ComponentPool.prototype.recycle = function (comp) {
  */
 ComponentPool.prototype.get = function () {
     let args = [].slice.call(arguments);
-    if (this._pool.length===0) {
-        if (args.length>0) {
-            return this.create.apply(this,args);
+    if (this._pool.length === 0) {
+        if (args.length > 0) {
+            return this.create.apply(this, args);
         } else {
             return this.create();
         }
     } else {
         let ret = this._pool.pop();
-        if (args.length>0) {
-            ret.__proto__.constructor.apply(ret,args);
+        if (args.length > 0) {
+            ret.__proto__.constructor.apply(ret, args);
         }
         return ret;
     }
@@ -76,7 +76,7 @@ ComponentPool.prototype.get = function () {
  * 销毁组件池
  */
 ComponentPool.prototype.destroy = function () {
-    while(this._pool.length>0) {
+    while (this._pool.length > 0) {
         this.popAndDestroy();
     }
 };
@@ -85,14 +85,14 @@ ComponentPool.prototype.destroy = function () {
  */
 ComponentPool.prototype.update = function (dt) {
     let poolLength = this._pool.length;
-    if (this._maxSize>0&&this._itemCount>this._maxSize) {
-        let minSize = this._minSize>0?this._minSize:10;
-        if (poolLength>minSize) {
+    if (this._maxSize > 0 && this._itemCount > this._maxSize) {
+        let minSize = this._minSize > 0 ? this._minSize : 10;
+        if (poolLength > minSize) {
             this.popAndDestroy();
         }
     }
-    if (this._minSize>0){
-        if (poolLength<this._minSize) {
+    if (this._minSize > 0) {
+        if (poolLength < this._minSize) {
             let obj = this.create();
             this._pool.push(obj);
         }

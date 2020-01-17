@@ -6,22 +6,23 @@ let _longBound = {
     max: Long.fromString("9223372036854775807")
 }
 
-class TAGLongArray extends BinaryBase{
-    constructor(){
+class TAGLongArray extends BinaryBase {
+    constructor() {
         super();
         this.type = "TAG_Long_Array";
-        this.value     = [];
+        this.value = [];
     }
-    _readBodyFromBuffer(buff, offset) {
-        let len        = buff.readUInt32BE(offset);
-        let nextOffset = offset + 4;
-        let endOffset  = nextOffset + len * 8;
-        this.value     = [];
 
-        for(let i = 0; i < endOffset-nextOffset; i += 8) {
-            let high =  buff.readInt32BE(nextOffset + i);
-            let low = buff.readInt32BE(nextOffset + i+4);
-            this.value.push(new Long(low,high));
+    _readBodyFromBuffer(buff, offset) {
+        let len = buff.readUInt32BE(offset);
+        let nextOffset = offset + 4;
+        let endOffset = nextOffset + len * 8;
+        this.value = [];
+
+        for (let i = 0; i < endOffset - nextOffset; i += 8) {
+            let high = buff.readInt32BE(nextOffset + i);
+            let low = buff.readInt32BE(nextOffset + i + 4);
+            this.value.push(new Long(low, high));
         }
 
         return 4 + len * 8;
@@ -29,7 +30,7 @@ class TAGLongArray extends BinaryBase{
 
     toJSON() {
         let ret = [];
-        for(let i=0;i<this.value.length;i++) {
+        for (let i = 0; i < this.value.length; i++) {
             ret.push(this.value[i].toString());
         }
         return ret;
@@ -40,27 +41,27 @@ class TAGLongArray extends BinaryBase{
     }
 
     setValue(array) {
-        if(!util.isArray(array)) {
+        if (!util.isArray(array)) {
             throw new Error("Value of TAG_Int_Array should be an array.");
         }
 
         let newArray = [];
-        for(let i = 0; i < array.length; i++) {
+        for (let i = 0; i < array.length; i++) {
             let value = array[i];
             let temp = null;
-            if(typeof value === "string") {
+            if (typeof value === "string") {
                 temp = Long.fromString(value);
-            } else if(value instanceof Long) {
+            } else if (value instanceof Long) {
                 temp = Long.fromString(value.toString());
-            } else if(typeof value === "number" && !isNaN(value)) {
+            } else if (typeof value === "number" && !isNaN(value)) {
                 temp = Long.fromNumber(value);
             }
 
-            if(null === temp) {
+            if (null === temp) {
                 throw new Error("Wrong type to set TAG_Long_Array's value.");
             }
 
-            if(temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
+            if (temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
                 throw new Error("Value of TAG_Long_Array should between " +
                     "-9223372036854775808 and 9223372036854775807");
             }
@@ -76,19 +77,19 @@ class TAGLongArray extends BinaryBase{
 
     unshift(value) {
         let temp = -1;
-        if(typeof value === "string") {
+        if (typeof value === "string") {
             temp = Long.fromString(value);
-        } else if(value instanceof Long) {
+        } else if (value instanceof Long) {
             temp = Long.fromString(value.toString());
-        } else if(typeof value === "number" && !isNaN(value)) {
+        } else if (typeof value === "number" && !isNaN(value)) {
             temp = Long.fromNumber(value);
         }
 
-        if(-1 === temp) {
+        if (-1 === temp) {
             throw new Error("Wrong type to set TAG_Long_Array's value.");
         }
 
-        if(temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
+        if (temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
             throw new Error("Value of TAG_Long_Array should between " +
                 "-9223372036854775808 and 9223372036854775807");
         }
@@ -97,19 +98,19 @@ class TAGLongArray extends BinaryBase{
 
     push(value) {
         let temp = -1;
-        if(typeof value === "string") {
+        if (typeof value === "string") {
             temp = Long.fromString(value);
-        } else if(value instanceof Long) {
+        } else if (value instanceof Long) {
             temp = Long.fromString(value.toString());
-        } else if(typeof value === "number" && !isNaN(value)) {
+        } else if (typeof value === "number" && !isNaN(value)) {
             temp = Long.fromNumber(value);
         }
 
-        if(-1 === temp) {
+        if (-1 === temp) {
             throw new Error("Wrong type to set TAG_Long_Array's value.");
         }
 
-        if(temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
+        if (temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
             throw new Error("Value of TAG_Long_Array should between " +
                 "-9223372036854775808 and 9223372036854775807");
         }
@@ -122,27 +123,27 @@ class TAGLongArray extends BinaryBase{
 
     insert(value, pos) {
         let temp = -1;
-        if(typeof value === "string") {
+        if (typeof value === "string") {
             temp = Long.fromString(value);
-        } else if(value instanceof Long) {
+        } else if (value instanceof Long) {
             temp = Long.fromString(value.toString());
-        } else if(typeof value === "number" && !isNaN(value)) {
+        } else if (typeof value === "number" && !isNaN(value)) {
             temp = Long.fromNumber(value);
         }
 
-        if(-1 === temp) {
+        if (-1 === temp) {
             throw new Error("Wrong type to set TAG_Long_Array's value.");
         }
 
-        if(temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
+        if (temp.lessThan(_longBound.min) || temp.greaterThan(_longBound.max)) {
             throw new Error("Value of TAG_Long_Array should between " +
                 "-9223372036854775808 and 9223372036854775807");
         }
 
-        if(pos < 0) pos = 0;
-        if(pos > this.value.length) pos = this.value.length;
+        if (pos < 0) pos = 0;
+        if (pos > this.value.length) pos = this.value.length;
         this.value.push([]);
-        for(let i = this.value.length - 1; i >= pos; i--) {
+        for (let i = this.value.length - 1; i >= pos; i--) {
             this.value[i + 1] = this.value[i];
         }
         this.value[pos] = temp;
@@ -150,11 +151,11 @@ class TAGLongArray extends BinaryBase{
 
     writeBuffer(buff, offset) {
         buff.writeUInt32BE(this.value.length, offset);
-        for(let i = 0; i < this.value.length; i++) {
+        for (let i = 0; i < this.value.length; i++) {
             let high = this.value[i].high;
             let low = this.value[i].low;
-            buff.writeInt32BE(high,offset + 4 + i * 8);
-            buff.writeInt32BE(low,offset + 4 + i * 8+4);
+            buff.writeInt32BE(high, offset + 4 + i * 8);
+            buff.writeInt32BE(low, offset + 4 + i * 8 + 4);
         }
 
         return 4 + this.value.length * 8;

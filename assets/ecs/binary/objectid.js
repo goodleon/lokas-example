@@ -26,33 +26,36 @@ let isBuffer = function (obj) {
  * @return {Object} instance of ObjectID.
  */
 function ObjectID(arg) {
-    if(!(this instanceof ObjectID)) return new ObjectID(arg);
-    if(arg && ((arg instanceof ObjectID) || arg._bsontype==="ObjectID"))
+    if (!(this instanceof ObjectID)) return new ObjectID(arg);
+    if (arg && ((arg instanceof ObjectID) || arg._bsontype === "ObjectID"))
         return arg;
 
     let buf;
 
-    if(isBuffer(arg) || (Array.isArray(arg) && arg.length===12)) {
+    if (isBuffer(arg) || (Array.isArray(arg) && arg.length === 12)) {
         buf = Array.prototype.slice.call(arg);
-    }
-    else if(typeof arg === "string") {
-        if(arg.length!==12 && !ObjectID.isValid(arg))
+    } else if (typeof arg === "string") {
+        if (arg.length !== 12 && !ObjectID.isValid(arg))
             throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
 
         buf = buffer(arg);
-    }
-    else if(/number|undefined/.test(typeof arg)) {
+    } else if (/number|undefined/.test(typeof arg)) {
         buf = buffer(generate(arg));
     }
 
     Object.defineProperty(this, "id", {
         enumerable: true,
-        get: function() { return String.fromCharCode.apply(this, buf); }
+        get: function () {
+            return String.fromCharCode.apply(this, buf);
+        }
     });
     Object.defineProperty(this, "str", {
-        get: function() { return buf.map(hex.bind(this, 2)).join(''); }
+        get: function () {
+            return buf.map(hex.bind(this, 2)).join('');
+        }
     });
 }
+
 module.exports = ObjectID;
 ObjectID.generate = generate;
 ObjectID.default = ObjectID;
@@ -64,9 +67,9 @@ ObjectID.default = ObjectID;
  * @return {ObjectID} return the created ObjectID
  * @api public
  */
-ObjectID.createFromTime = function(time){
+ObjectID.createFromTime = function (time) {
     time = parseInt(time, 10) % 0xFFFFFFFF;
-    return new ObjectID(hex(8,time)+"0000000000000000");
+    return new ObjectID(hex(8, time) + "0000000000000000");
 };
 
 /**
@@ -76,8 +79,8 @@ ObjectID.createFromTime = function(time){
  * @return {ObjectID} return the created ObjectID
  * @api public
  */
-ObjectID.createFromHexString = function(hexString) {
-    if(!ObjectID.isValid(hexString))
+ObjectID.createFromHexString = function (hexString) {
+    if (!ObjectID.isValid(hexString))
         throw new Error("Invalid ObjectID hex string");
 
     return new ObjectID(hexString);
@@ -93,8 +96,8 @@ ObjectID.createFromHexString = function(hexString) {
  * THE NATIVE DOCUMENTATION ISN'T CLEAR ON THIS GUY!
  * http://mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
  */
-ObjectID.isValid = function(objectid) {
-    if(!objectid || (typeof objectid !== 'string' && (typeof objectid !== 'object' || typeof objectid.toString !== 'function'))) return false;
+ObjectID.isValid = function (objectid) {
+    if (!objectid || (typeof objectid !== 'string' && (typeof objectid !== 'object' || typeof objectid.toString !== 'function'))) return false;
 
     //call .toString() to get the hex if we're
     // working with an instance of ObjectID
@@ -108,24 +111,23 @@ ObjectID.isValid = function(objectid) {
  * @return {void}
  * @api public
  */
-ObjectID.setMachineID = function(arg) {
+ObjectID.setMachineID = function (arg) {
     let machineID;
 
-    if(typeof arg === "string") {
+    if (typeof arg === "string") {
         // hex string
         machineID = parseInt(arg, 16);
 
         // any string
-        if(isNaN(machineID)) {
-            arg = ('000000' + arg).substr(-7,6);
+        if (isNaN(machineID)) {
+            arg = ('000000' + arg).substr(-7, 6);
 
             machineID = "";
-            for(let i = 0;i<6; i++) {
+            for (let i = 0; i < 6; i++) {
                 machineID += (arg.charCodeAt(i));
             }
         }
-    }
-    else if(/number|undefined/.test(typeof arg)) {
+    } else if (/number|undefined/.test(typeof arg)) {
         machineID = arg | 0;
     }
 
@@ -138,7 +140,7 @@ ObjectID.setMachineID = function(arg) {
  * @return {number}
  * @api public
  */
-ObjectID.getMachineID = function() {
+ObjectID.getMachineID = function () {
     return MACHINE_ID;
 }
 
@@ -152,7 +154,7 @@ ObjectID.prototype = {
      * @return {String} return the 24 byte hex string representation.
      * @api public
      */
-    toHexString: function() {
+    toHexString: function () {
         return this.str;
     },
 
@@ -163,7 +165,7 @@ ObjectID.prototype = {
      * @return {Boolean} the result of comparing two ObjectID's
      * @api public
      */
-    equals: function (other){
+    equals: function (other) {
         return !!other && this.str === other.toString();
     },
 
@@ -173,39 +175,39 @@ ObjectID.prototype = {
      * @return {Date} the generation date
      * @api public
      */
-    getTimestamp: function(){
-        return new Date(parseInt(this.str.substr(0,8), 16) * 1000);
+    getTimestamp: function () {
+        return new Date(parseInt(this.str.substr(0, 8), 16) * 1000);
     }
 };
 
 function next() {
-    return index = (index+1) % 0xFFFFFF;
+    return index = (index + 1) % 0xFFFFFF;
 }
 
 function generate(time) {
     if (typeof time !== 'number')
-        time = Date.now()/1000;
+        time = Date.now() / 1000;
 
     //keep it in the ring!
     time = parseInt(time, 10) % 0xFFFFFFFF;
 
     //FFFFFFFF FFFFFF FFFF FFFFFF
-    return hex(8,time) + hex(6,MACHINE_ID) + hex(4,pid) + hex(6,next());
+    return hex(8, time) + hex(6, MACHINE_ID) + hex(4, pid) + hex(6, next());
 }
 
 function hex(length, n) {
     n = n.toString(16);
-    return (n.length===length)? n : "00000000".substring(n.length, length) + n;
+    return (n.length === length) ? n : "00000000".substring(n.length, length) + n;
 }
 
 function buffer(str) {
-    let i=0,out=[];
+    let i = 0, out = [];
 
-    if(str.length===24)
-        for(;i<24; out.push(parseInt(str[i]+str[i+1], 16)),i+=2);
+    if (str.length === 24)
+        for (; i < 24; out.push(parseInt(str[i] + str[i + 1], 16)), i += 2) ;
 
-    else if(str.length===12)
-        for(;i<12; out.push(str.charCodeAt(i)),i++);
+    else if (str.length === 12)
+        for (; i < 12; out.push(str.charCodeAt(i)), i++) ;
 
     return out;
 }
@@ -218,6 +220,8 @@ let inspect = (Symbol && Symbol.for('nodejs.util.inspect.custom')) || 'inspect';
  * @return {String} return the 24 byte hex string representation.
  * @api private
  */
-ObjectID.prototype[inspect] = function() { return "ObjectID("+this+")" };
+ObjectID.prototype[inspect] = function () {
+    return "ObjectID(" + this + ")"
+};
 ObjectID.prototype.toJSON = ObjectID.prototype.toHexString;
 ObjectID.prototype.toString = ObjectID.prototype.toHexString;
