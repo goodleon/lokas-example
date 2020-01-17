@@ -187,14 +187,17 @@ let shapeRendererSystem = {
 module.exports = {
     name: 'PhysicTest',
     onLoad: function (ecs) {
-        ecs.registerComponent(CmpCircle);
-        ecs.registerComponent(CmpPolygon);
-        ecs.registerComponent(CmpCollider);
-        ecs.registerSingleton(CmpCanvas);
-        ecs.registerSingleton(CmpPhysicWorld);
-        ecs.registerComponent(CmpPosition);
-        ecs.registerComponent(CmpVelocity);
-        ecs.registerComponent(CmpAccelation);
+        //
+        ecs.registerComponent(CmpCircle); // 圆
+        ecs.registerComponent(CmpPolygon); // 多边形
+        ecs.registerComponent(CmpCollider); // 碰撞
+        ecs.registerComponent(CmpPosition); // 位置
+        ecs.registerComponent(CmpVelocity); // 向量
+        ecs.registerComponent(CmpAccelation); // 重力
+        //
+        ecs.registerSingletonComponent(CmpCanvas); // canvas
+        ecs.registerSingletonComponent(CmpPhysicWorld); // 物理世界
+        //
         ecs.registerSystem(MovingSystem);
         ecs.registerSystem(updateSystem);
         ecs.registerSystem(collisionSystem);

@@ -1,5 +1,6 @@
 const Component = require('../Component');
 
+// 圆
 class CmpCircle extends Component {
     static defineName() {
         return 'CmpCircle';

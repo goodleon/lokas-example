@@ -1014,7 +1014,7 @@ pro.registerComponent = function (name, Component, maxSize, minSize) {
 /**
  * 注册单例组件
  */
-pro.registerSingleton = function (name, Component) {
+pro.registerSingletonComponent = function (name, Component) {
     let pool = this._componentPools[name];
     if (pool) {
         logger.warn(this.getRoleString() + ' 已存在组件单例:' + name + ',不重新注册组件');
