@@ -2,7 +2,7 @@ const {CmpPosition, CmpVelocity, CmpAccelation} = require("./BaseComponents");
 const CmpCircle = require('./CmpCircle');
 const CmpPolygon = require('./CmpPolygon');
 
-let MovingSystem = [
+let SystemMoving = [
     function AccelSubSystem() {
         this.name = 'AccelSubSystem';
         this.components = [CmpVelocity, CmpAccelation];
@@ -37,12 +37,12 @@ let MovingSystem = [
 //         ecs.registerComponent('CmpAccelation', CmpAccelation, 300, 10);
 //         ecs.registerComponent('CmpPolygon', CmpPolygon, 200, 10);
 //         ecs.registerComponent('CmpCircle', CmpCircle, 200, 10);
-//         ecs.registerSystem(MovingSystem);
+//         ecs.registerSystem(SystemMoving);
 //     }
 // };
 
 module.exports = {
-    MovingSystem: MovingSystem
+    SystemMoving: SystemMoving
     // ,
     // MovingModule: MovingModule
 };

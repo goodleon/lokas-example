@@ -5,7 +5,7 @@ const CmpContact = require('CmpContact');
 const CmpBVTree = require('CmpBVTree');
 const CmpQuadTree = require('CmpQuadTree');
 const Component = require('Component');
-const {MovingSystem} = require('MovingSystem');
+const {SystemMoving} = require('SystemMoving');
 const {CmpPosition, CmpVelocity, CmpAccelation} = require("BaseComponents");
 const Dice = require('Dice');
 
@@ -99,7 +99,7 @@ class CmpCanvas extends Component {
     }
 }
 
-let updateSystem = {
+let SystemUpdate = {
     name: 'updating',
     components: [CmpCollider, [CmpCircle, CmpPolygon]],
     update: function (ent, dt, now, ecs) {
@@ -111,7 +111,7 @@ let updateSystem = {
     }
 };
 
-let collisionSystem = {
+let SystemCollision = {
     name: 'collision',
     enable: false,
     components: [CmpCollider, [CmpCircle, CmpPolygon], CmpVelocity],
@@ -156,7 +156,7 @@ let collisionSystem = {
     }
 };
 
-let shapeRendererSystem = {
+let SystemShapeRenderer = {
     name: 'shapeRenderer',
     components: [[CmpCircle, CmpPolygon]],
     beforeUpdate: function (dt, now, ecs) {
@@ -198,10 +198,10 @@ module.exports = {
         ecs.registerSingletonComponent(CmpCanvas); // canvas
         ecs.registerSingletonComponent(CmpPhysicWorld); // 物理世界
         //
-        ecs.registerSystem(MovingSystem);
-        ecs.registerSystem(updateSystem);
-        ecs.registerSystem(collisionSystem);
-        ecs.registerSystem(shapeRendererSystem);
+        ecs.registerSystem(SystemMoving);
+        ecs.registerSystem(SystemUpdate);
+        ecs.registerSystem(SystemCollision);
+        ecs.registerSystem(SystemShapeRenderer);
 
         ecs.setSpawner('CmpPolygon', function (ecs, x, y, points, rotation, scaleX, scaleY) {
             let ent = ecs.createEntity();
