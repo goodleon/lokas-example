@@ -6,7 +6,7 @@ const Connection = require('./Connection');
 const ComponentPool = require('./ComponentPool');
 const ComponentSingleton = require('./ComponentSingleton');
 const logger = require('../logger/Logger') || console;
-const Timer = require('./ECSTimer');
+const ECSTimer = require('./ECSTimer');
 const nbt = require('./binary/nbt');
 const EventEmitter = require('./event-emmiter');
 const Long = require('long');
@@ -53,7 +53,7 @@ class ECS {
         this._tick = 0;                     //步数
         this._updateInterval = updateTime || 1000 / 60.0;
         this._timeScale = Math.min(timeScale, 20) || 1.0;
-        this._timer = new Timer(this._updateInterval, this._timeScale);
+        this._timer = new ECSTimer(this._updateInterval, this._timeScale);
         this._timeOffset = 0;
         this._dirty = true;                //整个系统的脏标记d
         this._dirtyEntities = [];           //这轮的脏标记entity
@@ -95,7 +95,7 @@ class ECS {
 
         //其他绑定函数
         this._uniqueSchedules = {};         //仅一次的任务标记
-        this._spawners = {};
+        this._spawners = {};  // spawners 回调函数
         this._spawnerCb = {};
         this._objContainer = {};
         this._stateMachine = 'null';
@@ -311,10 +311,20 @@ pro.get = function (name) {
     return this._objContainer[name];
 };
 
+/**
+ * 注册 spawner回调函数
+ * @param name
+ * @param func
+ */
 pro.setSpawner = function (name, func) {
     this._spawners[name] = func.bind(null, this);
 };
 
+/**
+ * 生成一个实体
+ * @param name
+ * @returns {*}
+ */
 pro.spawnEntity = function (name) {
     let spawnFunc = this._spawners[name];
     let args = [].slice.call(arguments);
@@ -323,7 +333,7 @@ pro.spawnEntity = function (name) {
 };
 
 pro.createTimer = function (interval, timeScale) {
-    return new Timer(interval, timeScale);
+    return new ECSTimer(interval, timeScale);
 };
 
 pro.adjustTimer = function (time) {

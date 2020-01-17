@@ -161,6 +161,7 @@ let SystemShapeRenderer = {
     components: [[CmpCircle, CmpPolygon]],
     beforeUpdate: function (dt, now, ecs) {
         if (this.getSize() < 1200) {
+            // 生成多边形与圆形
             ecs.spawnEntity('CmpCircle', Dice.rng(-300, 300), Dice.rng(-300, 300), Dice.rng(3, 8), 1);
             ecs.spawnEntity('CmpPolygon', Dice.rng(-300, 300), Dice.rng(-300, 300), [[-4, -4], [4, -4], [4, 4], [-4, 4]], Dice.rng(0, 3), 1);
         }
@@ -178,8 +179,8 @@ let SystemShapeRenderer = {
     afterUpdate: function (dt, now, ecs) {
         let cCanvas = ecs.getSingleton('CmpCanvas');
         for (let i = 0; i < 7; i++) {
-            cCanvas.getContext(i).strokeColor = cc.Color.BLUE;
-            cCanvas.getContext(i).stroke();
+            cCanvas.getContext(i).strokeColor = cc.Color.YELLOW;
+            cCanvas.getContext(i).stroke(); // 划掉??
         }
     }
 };
@@ -203,6 +204,7 @@ module.exports = {
         ecs.registerSystem(SystemCollision);
         ecs.registerSystem(SystemShapeRenderer);
 
+        // 批量 生成
         ecs.setSpawner('CmpPolygon', function (ecs, x, y, points, rotation, scaleX, scaleY) {
             let ent = ecs.createEntity();
             ent.add(CmpPolygon, x, y, points, rotation, scaleX, scaleY);
@@ -228,6 +230,8 @@ module.exports = {
             ecs.getSingleton(CmpPhysicWorld).insert(ent);
             return ent;
         });
+
+        // 生成上下左右四个边
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[0, 0], [width, 0]]);
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[width, 0], [width, height]]);
         ecs.spawnEntity('Polygon1', -width / 2, -height / 2, [[width, height], [0, height]]);

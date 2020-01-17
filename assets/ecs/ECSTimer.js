@@ -1,14 +1,14 @@
 const async = require('async');
 const logger = require('../logger/Logger');
 
-let Timer = function (updateTime, timescale, isAsync) {
+let ECSTimer = function (updateTime, timescale, isAsync) {
     this._timeScale = timescale || 1.0;
     this.reset();
     this._updateTime = updateTime || 1000;
     this._type = isAsync || this.TYPE.SYNC;
 };
 
-Timer.prototype.reset = function () {
+ECSTimer.prototype.reset = function () {
     this._interval = null;          //更新间隔
     this._startTime = 0;            //开始时间
     this._timeOffset = 0;           //时间偏移量
@@ -29,44 +29,44 @@ Timer.prototype.reset = function () {
     this._tick = 0;
 };
 
-Timer.prototype.TYPE = {
+ECSTimer.prototype.TYPE = {
     SYNC: 0,
     ASYNC: 1,
     FIXED: 2
 };
 
-Timer.prototype.STATE = {
+ECSTimer.prototype.STATE = {
     STOP: 0,
     START: 1,
     ONSTOP: 2
 };
 
-Timer.prototype.setOffset = function (offset) {
+ECSTimer.prototype.setOffset = function (offset) {
     this._runningTime -= this._timeOffset;
     this._runningTime += offset;
     this._timeOffset = offset;
 };
 
-Timer.prototype.now = function () {
+ECSTimer.prototype.now = function () {
     return Date.now() + this._timeOffset;
 };
 
-Timer.prototype.start = function (time) {
+ECSTimer.prototype.start = function (time) {
     if (this._interval) return;
     this._startTime = time ? time : Date.now();
     this._startTimer();
     this._onStart();
 };
 
-Timer.prototype.resetStartTime = function () {
+ECSTimer.prototype.resetStartTime = function () {
     this._startTime = Date.now();
 };
 
-Timer.prototype.getSchedule = function (name) {
+ECSTimer.prototype.getSchedule = function (name) {
     return this._scheduleTasks[name];
 };
 //{name:name,time:time,task:function}
-Timer.prototype.schedule = function (name, task, interval, count, delay, startTime) {
+ECSTimer.prototype.schedule = function (name, task, interval, count, delay, startTime) {
     delay = delay || 0;
     if (this._scheduleTasks[name]) {
         logger.error('task name exists:' + name);
@@ -84,15 +84,15 @@ Timer.prototype.schedule = function (name, task, interval, count, delay, startTi
     };
 };
 
-Timer.prototype.scheduleOnce = function (name, task, interval, delay, startTime) {
+ECSTimer.prototype.scheduleOnce = function (name, task, interval, delay, startTime) {
     this.schedule(name, task, interval, 1, delay, startTime);
 };
 
-Timer.prototype.getSchedule = function (name) {
+ECSTimer.prototype.getSchedule = function (name) {
     return this._scheduleTasks[name];
 };
 
-Timer.prototype.unschedule = function (name) {
+ECSTimer.prototype.unschedule = function (name) {
     delete this._scheduleTasks[name];
     for (let i = 0; i < this.taskQueue.length; i++) {
         let task = this.taskQueue[i];
@@ -102,13 +102,13 @@ Timer.prototype.unschedule = function (name) {
     }
 };
 
-Timer.prototype.unscheduleAll = function () {
+ECSTimer.prototype.unscheduleAll = function () {
     this.taskQueue = [];
     this.removeTasks = [];
     this._scheduleTasks = [];
 };
 
-Timer.prototype.activeSchedule = function (interval, now) {
+ECSTimer.prototype.activeSchedule = function (interval, now) {
     this.taskQueue = [];
     this.removeTasks = [];
     for (let i in this._scheduleTasks) {
@@ -158,33 +158,33 @@ Timer.prototype.activeSchedule = function (interval, now) {
     this.removeTasks = [];
 };
 
-Timer.prototype.stop = function () {
+ECSTimer.prototype.stop = function () {
     this._onStop();
     this._stopTimer();
     this._runningTime = 0;
     this._startTime = 0;
 };
 
-Timer.prototype.pause = function () {
+ECSTimer.prototype.pause = function () {
     this._onPause();
     this._stopTimer();
 };
 
-Timer.prototype.resume = function () {
+ECSTimer.prototype.resume = function () {
     if (this._interval) return;
     this._prevInterval = this._updateTime;
     this._startTimer();
     this._onResume();
 };
 
-Timer.prototype.destroy = function () {
+ECSTimer.prototype.destroy = function () {
     this.unscheduleAll();
     this.stop();
     this.reset();
 };
 
 
-Timer.prototype.instantUpdate = function () {
+ECSTimer.prototype.instantUpdate = function () {
     this._state = this.STATE.START;
     let now = Date.now();
     let interval = now - this._lastUpdateTime;
@@ -201,7 +201,7 @@ Timer.prototype.instantUpdate = function () {
     this._lastUpdateTime = now;
 };
 
-Timer.prototype._syncUpdate = function () {
+ECSTimer.prototype._syncUpdate = function () {
     this._lastUpdateTime = Date.now();
     this.instantUpdate();
     if (!this._interval) {
@@ -212,7 +212,7 @@ Timer.prototype._syncUpdate = function () {
     }
 };
 
-Timer.prototype._asyncUpdate = function () {
+ECSTimer.prototype._asyncUpdate = function () {
     this._state = this.STATE.START;
     let self = this;
     let now = Date.now();
@@ -261,7 +261,7 @@ Timer.prototype._asyncUpdate = function () {
     })
 };
 
-Timer.prototype._startTimer = function () {
+ECSTimer.prototype._startTimer = function () {
     if (this._type === this.TYPE.SYNC) {
         this._syncUpdate();
     } else if (this._type === this.TYPE.ASYNC) {
@@ -279,32 +279,32 @@ Timer.prototype._startTimer = function () {
     }
 };
 
-Timer.prototype._stopTimer = function () {
+ECSTimer.prototype._stopTimer = function () {
     clearInterval(this._interval);
     this._interval = null;
 };
 
-Timer.prototype._onStart = function () {
+ECSTimer.prototype._onStart = function () {
     this._onStartCb && this._onStartCb();
 };
 
-Timer.prototype._onResume = function () {
+ECSTimer.prototype._onResume = function () {
     this._onResumeCb && this._onResumeCb();
 };
 
-Timer.prototype._onStop = function () {
+ECSTimer.prototype._onStop = function () {
     this._onStopCb && this._onStopCb();
 };
 
-Timer.prototype._onPause = function () {
+ECSTimer.prototype._onPause = function () {
     this._onPauseCb && this._onPauseCb();
 };
 
-Timer.prototype._onDestroy = function () {
+ECSTimer.prototype._onDestroy = function () {
     this._onDestroyCb && this._onDestroyCb();
 };
 
-Object.defineProperty(Timer.prototype, 'timeScale', {
+Object.defineProperty(ECSTimer.prototype, 'timeScale', {
     set: function (v) {
         this._timeScale = v;
     },
@@ -313,7 +313,7 @@ Object.defineProperty(Timer.prototype, 'timeScale', {
     }
 });
 
-Object.defineProperty(Timer.prototype, 'updateTime', {
+Object.defineProperty(ECSTimer.prototype, 'updateTime', {
     set: function (v) {
         this.updateTime = v;
         this.pause();
@@ -324,65 +324,65 @@ Object.defineProperty(Timer.prototype, 'updateTime', {
     }
 });
 
-Object.defineProperty(Timer.prototype, 'lastUpdateTime', {
+Object.defineProperty(ECSTimer.prototype, 'lastUpdateTime', {
     get: function () {
         return this._lastUpdateTime + this._timeOffset;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'startTime', {
+Object.defineProperty(ECSTimer.prototype, 'startTime', {
     get: function () {
         return this._startTime + this._timeOffset;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'runningTime', {
+Object.defineProperty(ECSTimer.prototype, 'runningTime', {
     get: function () {
         return this._runningTime;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'onStart', {
+Object.defineProperty(ECSTimer.prototype, 'onStart', {
     set: function (cb) {
         this._onStartCb = cb;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'onStop', {
+Object.defineProperty(ECSTimer.prototype, 'onStop', {
     set: function (cb) {
         this._onStopCb = cb;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'onPause', {
+Object.defineProperty(ECSTimer.prototype, 'onPause', {
     set: function (cb) {
         this._onPauseCb = cb;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'onResume', {
+Object.defineProperty(ECSTimer.prototype, 'onResume', {
     set: function (cb) {
         this._onResumeCb = cb;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'onDestroy', {
+Object.defineProperty(ECSTimer.prototype, 'onDestroy', {
     set: function (cb) {
         this._onDestroyCb = cb;
     }
 });
 
-Object.defineProperty(Timer.prototype, 'onUpdate', {
+Object.defineProperty(ECSTimer.prototype, 'onUpdate', {
     set: function (cb) {
         this._onUpdateCb = cb;
     }
 });
 
 
-Object.defineProperty(Timer.prototype, 'onLateUpdate', {
+Object.defineProperty(ECSTimer.prototype, 'onLateUpdate', {
     set: function (cb) {
         this._onLateUpdateCb = cb;
     }
 });
 
-module.exports = Timer;
+module.exports = ECSTimer;
