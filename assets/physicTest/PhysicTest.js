@@ -57,9 +57,9 @@ class CmpPhysicWorld extends Component {
     }
 }
 
-class Canvas extends Component {
+class CmpCanvas extends Component {
     static defineName() {
-        return 'Canvas';
+        return 'CmpCanvas';
     }
 
     constructor() {
@@ -164,19 +164,19 @@ let shapeRendererSystem = {
             ecs.spawnEntity('CmpCircle', Dice.rng(-300, 300), Dice.rng(-300, 300), Dice.rng(3, 8), 1);
             ecs.spawnEntity('CmpPolygon', Dice.rng(-300, 300), Dice.rng(-300, 300), [[-4, -4], [4, -4], [4, 4], [-4, 4]], Dice.rng(0, 3), 1);
         }
-        let cCanvas = ecs.getSingleton('Canvas');
+        let cCanvas = ecs.getSingleton('CmpCanvas');
         cCanvas.clear();
     },
     update: (ent, dt, now, ecs) => {
         let cPolygon = ent.get('CmpPolygon');
         let cCircle = ent.get('CmpCircle');
-        let cCanvas = ecs.getSingleton('Canvas');
+        let cCanvas = ecs.getSingleton('CmpCanvas');
         let context = cCanvas.getContext(Dice.rngInt(0, 6));
         cPolygon && cPolygon.draw(context);
         cCircle && cCircle.draw(context);
     },
     afterUpdate: function (dt, now, ecs) {
-        let cCanvas = ecs.getSingleton('Canvas');
+        let cCanvas = ecs.getSingleton('CmpCanvas');
         for (let i = 0; i < 7; i++) {
             cCanvas.getContext(i).strokeColor = cc.Color.BLUE;
             cCanvas.getContext(i).stroke();
@@ -190,7 +190,7 @@ module.exports = {
         ecs.registerComponent(CmpCircle);
         ecs.registerComponent(CmpPolygon);
         ecs.registerComponent(CmpCollider);
-        ecs.registerSingleton(Canvas);
+        ecs.registerSingleton(CmpCanvas);
         ecs.registerSingleton(CmpPhysicWorld);
         ecs.registerComponent(CmpPosition);
         ecs.registerComponent(CmpVelocity);
